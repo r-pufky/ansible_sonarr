@@ -1,0 +1,47 @@
+---
+###############################################################################
+# Manager Sonarr Users
+###############################################################################
+# Check if user exists and create if enabled.
+#
+# Args:
+#   sonarr_user: string sonarr username.
+#   sonarr_group: string sonarr group.
+#   sonarr_create_user: boolean true to create role default user.
+#   sonarr_default_user: dict containing builitin.user options for sonarr.
+#   sonarr_default_group: dict containing builitin.group options for sonarr.
+
+- name: 'manage users | confirm user exists'
+  ansible.builtin.command: 'id {{ sonarr_user }}'
+  register: _sonarr_user_exists
+  changed_when: _sonarr_user_exists.rc > 0
+  failed_when: false
+
+- name: 'manage users | confirm group exists'
+  ansible.builtin.command: 'groups {{ sonarr_group }}'
+  register: _sonarr_group_exists
+  changed_when: _sonarr_group_exists.rc > 0
+  failed_when: false
+
+- name: 'manage users | create sonarr group'
+  ansible.builtin.group:
+    name:  '{{ sonarr_default_group.name }}'
+    gid:   '{{ sonarr_default_group.gid }}'
+    state: 'present'
+  when: sonarr_create_user and _sonarr_group_exists.rc != 0
+
+- name: 'manage users | create sonarr user (logins disabled)'
+  ansible.builtin.user:
+    name:            '{{ sonarr_default_user.name }}'
+    group:           '{{ sonarr_default_user.group }}'
+    uid:             '{{ sonarr_default_user.uid }}'
+    shell:           '{{ sonarr_default_user.shell }}'
+    home:            '{{ sonarr_default_user.home }}'
+    create_home:     '{{ sonarr_default_user.create_home }}'
+    password:        '{{ sonarr_default_user.password }}'
+    password_lock:   '{{ sonarr_default_user.password_lock }}'
+    update_password: '{{ sonarr_default_user.update_password }}'
+    expires:         '{{ sonarr_default_user.expires }}'
+    system:          '{{ sonarr_default_user.system }}'
+    state:           'present'
+  when: sonarr_create_user and _sonarr_user_exists.rc != 0
