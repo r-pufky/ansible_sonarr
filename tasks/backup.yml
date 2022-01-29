@@ -1,0 +1,55 @@
+---
+###############################################################################
+# Sonarr Backup
+###############################################################################
+# Backup an existing Sonarr installation.
+#
+# Reference:
+# * https://github.com/NasKar2/freenas-backup-apps/blob/master/sonarrbackup.sh
+
+- name: 'backup | shutdown sonarr for backup'
+  ansible.builtin.service:
+    name:  'sonarr'
+    state: 'stopped'
+
+- name: 'backup | setup staging'
+  ansible.builtin.file:
+    path:  '{{ sonarr_staging }}'
+    mode:  0700
+    state: 'directory'
+
+# *.db-*, sonarr.pid are state; don't restore these.
+# archive only operates on paths INCLUDED in archive, hence /*
+- name: 'backup | create backup'
+  community.general.archive:
+    path: '{{ sonarr_dir }}/*'
+    mode: 0700
+    dest: '{{ sonarr_staging }}/sonarr-config.tar.gz'
+    exclude_path:
+      - '{{ sonarr_dir }}/*.db-*'
+      - '{{ sonarr_dir }}/MediaCover'
+      - '{{ sonarr_dir }}/sonarr.pid'
+
+- name: 'backup | retrieve backup'
+  ansible.builtin.fetch:
+    src:  '{{ sonarr_staging }}/sonarr-config.tar.gz'
+    dest: '{{ sonarr_local_backup }}'
+    flat: true
+
+- name: 'backup | ENCRYPTION NOTICE'
+  ansible.builtin.debug:
+    msg: |
+
+      BE SURE TO ENCRYPT BEFORE COMMITING CHANGES.
+
+      ansible-vault encrypt '{{ sonarr_local_backup }}'
+
+- name: 'backup | start sonarr'
+  ansible.builtin.service:
+    name:  'sonarr'
+    state: 'started'
+
+- name: 'backup | cleanup'
+  ansible.builtin.file:
+    path:  '{{ sonarr_staging }}'
+    state: 'absent'

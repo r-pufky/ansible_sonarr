@@ -1,0 +1,60 @@
+---
+###############################################################################
+# Sonarr Restore
+###############################################################################
+# Restore an existing Sonarr installation.
+#
+# Reference:
+# * https://github.com/NasKar2/freenas-backup-apps/blob/master/sonarrbackup.sh
+
+- name: 'restore | sonarr data is mounted, not local.'
+  ansible.builtin.fail:
+    msg: 'Restore task cannot be executed against a mountpoint; only local.'
+
+- name: 'restore | shutdown sonarr for restore'
+  ansible.builtin.service:
+    name:  'sonarr'
+    state: 'stopped'
+
+- name: 'restore | setup staging'
+  ansible.builtin.file:
+    path:  '{{ sonarr_staging }}'
+    mode:  0700
+    state: 'directory'
+
+- name: 'restore | stage backup'
+  ansible.builtin.command: "mv '{{ sonarr_dir }}' '{{ sonarr_staging }}/data'"
+  args:
+    creates: '{{ sonarr_staging }}/data'
+    removes: '{{ sonarr_dir }}'
+
+- name: 'restore | prep restore'
+  ansible.builtin.file:
+    path:  '{{ sonarr_dir }}'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode:  0750
+    state: 'directory'
+
+# tar preserves file permissions
+- name: 'restore | restore backup'
+  ansible.builtin.unarchive:
+    src:  '{{ sonarr_local_backup }}'
+    dest: '{{ sonarr_dir }}'
+    extra_opts: '--strip-components=1'
+
+- name: 'restore | set ownership'
+  ansible.builtin.command: 'chown -R {{ sonarr_user }}:{{ sonarr_group }} {{ sonarr_dir }}'
+  args:
+    warn: false
+  changed_when: false
+
+- name: 'restore | start sonarr'
+  ansible.builtin.service:
+    name:  'sonarr'
+    state: 'started'
+
+- name: 'restore | cleanup'
+  ansible.builtin.file:
+    path:  '{{ sonarr_staging }}'
+    state: 'absent'

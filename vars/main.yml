@@ -1,0 +1,82 @@
+---
+###############################################################################
+# Default Sonarr Package Dependencies
+###############################################################################
+# Default required packages for Sonarr install.
+
+sonarr_default_packages:
+  - 'gnupg2'
+
+###############################################################################
+# Default Sonarr User Group
+###############################################################################
+# Default group settings if an Sonarr user is force created.
+
+sonarr_default_group:
+  name: 'media'
+  gid:  5555
+
+###############################################################################
+# Default Sonarr Repositories
+###############################################################################
+# Default apt repository to use if not in supported repositories.
+#
+# Reference:
+# * http://apt.sonarr.tv/debian/dists/
+
+sonarr_default_repository: 'buster'
+sonarr_supported_repositories:
+  - 'buster'
+  - 'jessie'
+  - 'stretch'
+  - 'testing'
+
+###############################################################################
+# Sonarr Mono Version
+###############################################################################
+# Default Mono library to use if not in supported libraries.
+#
+# Reference:
+# * https://download.mono-project.com/repo/debian
+
+sonarr_default_mono_library: 'stable-buster'
+sonarr_mono_supported_libraries:
+  - 'bionic'
+  - 'buster'
+  - 'focal'
+  - 'jessie'
+  - 'precise'
+  - 'raspbianbuster'
+  - 'raspbianjessie'
+  - 'raspbianstretch'
+  - 'stretch'
+  - 'trusty'
+  - 'wheezy'
+  - 'xenial'
+
+###############################################################################
+# Default Sonarr User Account
+###############################################################################
+# Default user settings if an Sonarr user is force created.
+#
+# Logins are disabled.
+
+sonarr_default_user:
+  name:            'media'
+  group:           'media'
+  uid:             5555
+  shell:           '/usr/sbin/nologin'
+  home:            '/nonexistent'
+  create_home:     false
+  password:        '!'
+  password_lock:   true
+  update_password: 'always'
+  expires:         -1
+  system:          true
+
+###############################################################################
+# Sonarr Configuration Version
+###############################################################################
+# Base version used for initial role creation.
+
+sonarr_version: '3.0.2.4552'

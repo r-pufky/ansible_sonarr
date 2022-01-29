@@ -1,0 +1,10 @@
+---
+###############################################################################
+# Sonarr Handlers
+###############################################################################
+
+- name: 'restart sonarr'
+  ansible.builtin.systemd:
+    name:    'sonarr'
+    enabled: true
+    state:   'restarted'
