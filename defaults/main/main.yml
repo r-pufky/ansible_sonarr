@@ -18,9 +18,6 @@ sonarr_staging: '/var/lib/sonarr-staging'
 # Target location of backup file on ansible host.
 sonarr_local_backup: 'host_vars/data/sonarr-config.tar.gz'
 
-# Subdomain hint for sonarr service.
-sonarr_subdomain: 'sonarr'
-
 ###############################################################################
 # Sonarr config.xml Configuration
 ###############################################################################
