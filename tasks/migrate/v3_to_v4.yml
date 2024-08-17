@@ -1,0 +1,92 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Sonarr V3 to V4 Migration
+###############################################################################
+# Migrate from Sonarr V3. Sonarr V3 installed via debian package which is no
+# longer produced for sonarr releases. These are now built manually.
+#
+# Return machine to a 'clean' slate for V4 deployment, archiving existing data
+# and staging to a new sonarr_data_dir if different from package location.
+
+- name: 'Migrate | export data locations'
+  ansible.builtin.set_fact:
+    sonarr_v3_archive: '{{ sonarr_role_github_extract_dest }}/archive/v3'
+    sonarr_v3_install: '/var/lib/sonarr'
+
+- name: 'Migrate | create archive location {{ sonarr_v3_archive }}'
+  ansible.builtin.file:
+    path: '{{ sonarr_v3_archive }}'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode: '0700'
+    state: 'directory'
+
+- name: 'Migrate | archive existing data to {{ sonarr_v3_archive }}'
+  ansible.builtin.shell: >
+    cp -av {{ sonarr_v3_install }}/* {{ sonarr_v3_archive }};
+  args:
+    creates: '{{ sonarr_v3_archive }}/sonarr.db'
+
+- name: 'Migrate | remove v3 sonarr package'
+  ansible.builtin.apt:
+    name: 'sonarr'
+    state: 'absent'
+    autoremove: true
+    purge: true
+
+- name: 'Migrate | remove v3 sonarr source list'
+  ansible.builtin.file:
+    name: '/etc/apt/sources.list.d/sonarr.list'
+    state: 'absent'
+
+- name: 'Migrate | remove v3 sonarr repo key'
+  ansible.builtin.apt_key:
+    id: '2009837CBFFD68F45BC180471F4F90DE2A9B4BF8'
+    state: 'absent'
+
+- name: 'Migrate | remove v3 mono source list'
+  ansible.builtin.file:
+    name: '/etc/apt/sources.list.d/mono.list'
+    state: 'absent'
+
+- name: 'Migrate | remove v3 mono repo key'
+  ansible.builtin.apt_key:
+    id: '3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF'
+    state: 'absent'
+
+- name: 'Migrate | update apt caches'
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: 'Migrate | set sonarr data dir {{ sonarr_data_dir }}'
+  ansible.builtin.file:
+    path: '{{ sonarr_data_dir }}'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode: '0755'
+    state: 'directory'
+
+- name: 'Migrate | existing data to {{ sonarr_data_dir }}'
+  ansible.builtin.shell: >
+    cp -av {{ sonarr_v3_archive }}/* {{ sonarr_data_dir }};
+  args:
+    creates: '{{ sonarr_data_dir }}/sonarr.db'
+
+- name: 'Migrate | vacuum database for upgrade prep'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_data_dir }}/sonarr.db'
+    sqlite_vacuum: true
+    sqlite_install: true
+
+- name: 'Migrate | complete'
+  ansible.builtin.debug:
+    msg: |
+      Sonarr V3 migration completed.
+
+      * User data archived: {{ sonarr_v3_archive }}
+      * User data migrated to: {{ sonarr_data_dir }}
+      * Sonarr apt keys removed
+      * Apt package removed

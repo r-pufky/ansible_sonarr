@@ -1,0 +1,24 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Sonarr Install
+###############################################################################
+# Install specified version from github release.
+
+- name: 'Install | sonarr package {{ sonarr_version }}'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.github'
+  vars:
+    github_repo_owner: '{{ sonarr_role_github_owner }}'
+    github_repo_repo: '{{ sonarr_role_github_repo }}'
+    github_repo_release: '{{ sonarr_version }}'
+    github_repo_archive_type: '{{ sonarr_role_github_repo_archive_type }}'
+    github_file_owner: '{{ sonarr_user }}'
+    github_file_group: '{{ sonarr_group }}'
+    github_extract_dest: '{{ sonarr_role_github_extract_dest }}'
+    github_extract_symlink_target: '{{ sonarr_role_github_extract_symlink_target }}'
+    github_extract_delete_old_versions: '{{ sonarr_delete_old_versions }}'
+    github_force_overwrite: '{{ sonarr_force_overwrite }}'
+    github_extract_mode: 'a-st,o-rwx'
+    github_extract_extra_opts: '--strip-components=1'
+  when: not sonarr_force_config_only

@@ -1,0 +1,9 @@
+---
+- name: 'Migrate V3 to V4 | converge'
+  hosts: all
+  gather_facts: true
+  tags: 'molecule-idempotence-notest'
+  tasks:
+    - name: 'Migrate V3 to V4 | converge | apply sonarr role to test systems'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.sonarr'

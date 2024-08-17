@@ -1,0 +1,38 @@
+---
+# yamllint disable rule:line-length
+- name: 'Default | verify | config.xml'
+  hosts: 'all'
+  gather_facts: false
+  tags: 'molecule-idempotence-notest'
+  tasks:
+    - name: 'Default | verify | config.xml | query file'
+      ansible.builtin.copy:
+        src: '../resources/files/config.xml'
+        dest: '/var/lib/sonarr/config.xml'
+        owner: 'media'
+        group: 'media'
+        mode: '0600'
+      check_mode: true
+      diff: true
+      register: _test_sonarr_config_xml
+
+    - name: 'Default | verify | config.xml | assert expected file'
+      ansible.builtin.assert:
+        that:
+          - not _test_sonarr_config_xml.changed
+        fail_msg: '/var/lib/sonarr/config.xml is not in expected format: {{ _test_sonarr_config_xml.diff }}.'
+
+- name: 'Default | verify | service running'
+  hosts: 'all'
+  gather_facts: false
+  tags: 'molecule-idempotence-notest'
+  tasks:
+    - name: 'Default | verify | service running | query service status'
+      ansible.builtin.service_facts:
+      register: _test_sonarr_service_state
+
+    - name: 'Default | verify | service running | verify sonarr is running'
+      ansible.builtin.assert:
+        that:
+          - _test_sonarr_service_state.ansible_facts.services['sonarr.service'].state == 'running'
+        fail_msg: 'sonarr service NOT running.'

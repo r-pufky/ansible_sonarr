@@ -1,0 +1,21 @@
+---
+###############################################################################
+# Settings ➤ Quality
+###############################################################################
+
+- name: 'DB | quality | quality definitions | set'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_quality_definitions }}
+      (
+      '{{ item.id | int }}',
+      '{{ item.quality | int }}',
+      '{{ item.title }}',
+      '{{ item.min_size }}',
+      '{{ item.max_size }}',
+      '{{ item.preferred_size }}'
+      );
+  loop: '{{ sonarr_quality_quality_definitions }}'

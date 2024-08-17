@@ -1,16 +1,21 @@
 <Config>
-  <Port>{{ sonarr_port | default('8989') }}</Port>
-  <BindAddress>{{ sonarr_bind_address }}</BindAddress>
-  <SslPort>{{ sonarr_ssl_port | default('9898') }}</SslPort>
-  <EnableSsl>{{ sonarr_enable_ssl }}</EnableSsl>
-  <ApiKey>{{ sonarr_api_key }}</ApiKey>
-  <AuthenticationMethod>{{ sonarr_authentication_method }}</AuthenticationMethod>
-  <LogLevel>{{ sonarr_log_level }}</LogLevel>
-  <LaunchBrowser>{{ sonarr_launch_browser }}</LaunchBrowser>
-  <Branch>{{ sonarr_branch }}</Branch>
-  <SslCertHash>{{ sonarr_ssl_cert_hash }}</SslCertHash>
-  <UpdateMechanism>{{ sonarr_update_mechanism }}</UpdateMechanism>
-  <AnalyticsEnabled>{{ sonarr_analytics_enabled }}</AnalyticsEnabled>
-  <UpdateAutomatically>{{ sonarr_update_automatically }}</UpdateAutomatically>
-  <UrlBase>{{ sonarr_url_base }}</UrlBase>
+  <BindAddress>{{ sonarr_general_host_bind_address | default('*') }}</BindAddress>
+  <Port>{{ sonarr_general_host_port | default(8989) }}</Port>
+  <SslPort>{{ sonarr_general_host_ssl_port | default(9898) }}</SslPort>
+  <EnableSsl>{{ sonarr_general_host_ssl_enable | default(false) | bool | string | capitalize }}</EnableSsl>
+  <LaunchBrowser>{{ sonarr_general_startup_launch_browser | default(false) | bool | string | capitalize }}</LaunchBrowser>
+  <ApiKey>{{ sonarr_general_security_api_key | default(lookup("ansible.builtin.password", "/dev/null", chars=["ascii_letters", "digits"], length=32)) }}</ApiKey>
+  <AuthenticationMethod>{{ sonarr_general_security_auth_method | default('None') | capitalize }}</AuthenticationMethod>
+  <AuthenticationRequired>{{ 'Enabled' if sonarr_general_security_auth_required else 'DisabledForLocalAddresses' }}</AuthenticationRequired>
+  <Branch>{{ sonarr_general_updates_branch | default('main') | lower }}</Branch>
+  <LogLevel>{{ sonarr_general_security_logging_log_level | default('info') | lower }}</LogLevel>
+  <SslCertPath>{{ sonarr_general_host_ssl_cert_path | default('') }}</SslCertPath>
+  <SslCertPassword>{{ sonarr_general_host_ssl_cert_password | default('') }}</SslCertPassword>
+  <UrlBase>{{ sonarr_general_host_url_base | default('') }}</UrlBase>
+  <InstanceName>{{ sonarr_general_host_instance_name | default('Sonarr') }}</InstanceName>
+  <AnalyticsEnabled>{{ sonarr_send_anonymous_usage_data | default(false) | bool | string | capitalize }}</AnalyticsEnabled>
+  <UpdateAutomatically>{{ sonarr_general_updates_automatic_enable | default(false) | bool | string | capitalize }}</UpdateAutomatically>
+  <UpdateMechanism>{{ 'BuiltIn' if sonarr_general_updates_update_mechanism_builtin else 'Script' }}</UpdateMechanism>
+  <UpdateScriptPath>{{ sonarr_general_updates_update_script_path | default('/dev/null') }}</UpdateScriptPath>
+  <Theme>{{ sonarr_ui_style_theme | default('auto') | lower }}</Theme>
 </Config>

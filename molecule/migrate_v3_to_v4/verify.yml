@@ -1,0 +1,60 @@
+---
+# yamllint disable rule:line-length
+#
+# Apply the same final tests from default to verify upgrade success; confirm
+# database is upgraded.
+
+- name: 'Migrate V3 to V4 | verify | config.xml'
+  hosts: 'all'
+  gather_facts: false
+  tags: 'molecule-idempotence-notest'
+  tasks:
+    - name: 'Migrate V3 to V4 | verify | config.xml | query file'
+      ansible.builtin.copy:
+        src: '../resources/files/config.xml'
+        dest: '/var/lib/sonarr/config.xml'
+        owner: 'media'
+        group: 'media'
+        mode: '0600'
+      check_mode: true
+      diff: true
+      register: _test_sonarr_config_xml
+
+    - name: 'Migrate V3 to V4 | verify | config.xml | assert expected file'
+      ansible.builtin.assert:
+        that:
+          - not _test_sonarr_config_xml.changed
+        fail_msg: '/var/lib/sonarr/config.xml is not in expected format: {{ _test_sonarr_config_xml.diff }}.'
+
+- name: 'Migrate V3 to V4 | verify | service running | service running'
+  hosts: 'all'
+  gather_facts: false
+  tags: 'molecule-idempotence-notest'
+  tasks:
+    - name: 'Migrate V3 to V4 | verify | service running | query service status'
+      ansible.builtin.service_facts:
+      register: _test_sonarr_service_state
+
+    - name: 'Migrate V3 to V4 | verify | service running | verify sonarr is running'
+      ansible.builtin.assert:
+        that:
+          - _test_sonarr_service_state.ansible_facts.services['sonarr.service'].state == 'running'
+        fail_msg: 'sonarr service NOT running.'
+
+- name: 'Migrate V3 to V4 | verify | sonarr.db version > 172'
+  hosts: 'all'
+  gather_facts: false
+  tags: 'molecule-idempotence-notest'
+  tasks:
+    - name: 'Migrate V3 to V4 | verify | sonarr.db version > 172 | query db'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.sqlite'
+      vars:
+        sqlite_db: '/var/lib/sonarr/sonarr.db'
+        sqlite_sql: 'select max(Version) from VersionInfo;'
+
+    - name: 'Migrate V3 to V4 | verify | sonarr.db version > 172 | assert updated db version'
+      ansible.builtin.assert:
+        that:
+          - _sqlite_results.stdout | int > 172  # last debian 11 db version.
+        fail_msg: '/var/lib/sonarr/sonarr.db version should be > 172 (_sqlite_results.stdout)'

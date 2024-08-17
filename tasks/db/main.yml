@@ -1,0 +1,54 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Sonarr DB
+###############################################################################
+# Modify DB if it is a verified version or skip; if it does not exist, copy a
+# template verified DB version and modify.
+#
+# DB does not use triggers; tables can safety be re-created in place during
+# role application.
+#
+# If DB modifications are skipped, print warning message.
+
+- name: 'DB | check sqlite db'
+  ansible.builtin.stat:
+    path: '{{ sonarr_role_db }}'
+  register: _sonarr_db
+
+# TODO(role): DB will automatically be upgraded to whatever version when the
+#     system starts; so this CAN be used to set initial settings and migrate
+#     So force delete might be a way to install a version set settings, and
+#     upgrade within sonarr itself.
+- name: 'DB | create db {{ sonarr_role_validate_release }}-{{ sonarr_role_validate_db_release }}'
+  ansible.builtin.copy:
+    src: 'files/db/{{ sonarr_role_validate_release }}-{{ sonarr_role_validate_db_release }}.db'
+    dest: '{{ sonarr_role_db }}'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode: 'a-st,o-rwx'
+  when: not _sonarr_db.stat.exists
+
+- name: 'DB | check version'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: '{{ sonarr_role_db_version }}'
+
+- name: 'DB | set detected version'
+  ansible.builtin.set_fact:
+    _sonarr_db_version: '{{ _sqlite_results.stdout | int }}'
+
+- name: 'DB | '
+# TODO(role): maybe this should be a separate file for db actions, and sub
+# directory with versioned actions for it.
+- name: 'DB | add user'
+  ansible.builtin.command:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}
+    sqlite_sql: '{{ sonarr_role_db_version }}'
+  changed_when: false
+  when: '_sonarr_db_version.stdout == "{{ sonarr_role_db_version }}"'
+

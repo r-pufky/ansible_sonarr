@@ -1,0 +1,10 @@
+---
+###############################################################################
+# Sonarr Packages
+###############################################################################
+
+- name: 'Packages | install dependencies'
+  ansible.builtin.apt:
+    name: '{{ sonarr_role_packages }}'
+    state: '{{ sonarr_role_package_state }}'
+    update_cache: true

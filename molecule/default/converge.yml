@@ -1,0 +1,9 @@
+---
+- name: 'Default | converge'
+  hosts: all
+  gather_facts: true
+  tags: 'molecule-idempotence-notest'
+  tasks:
+    - name: 'Default | converge | apply sonarr role to test systems'
+      ansible.builtin.include_role:
+        name: 'r_pufky.srv.sonarr'

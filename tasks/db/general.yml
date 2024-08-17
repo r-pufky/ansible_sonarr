@@ -1,0 +1,215 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Settings ➤ General
+###############################################################################
+
+- name: 'DB | general | host | application URL'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'applicationurl',
+      '{{ sonarr_general_host_application_url }}'
+      );
+
+# Only one user can be specified; additional valid users will cause the WebUI
+# to fail loading.
+#
+# Sonarr uses UUIDv4 (ansible generates a UUIDv5); this currently does not
+# cause any issues.
+#
+# See references for source password generation:
+#   * salt: 16 random binary bytes (stored as base64)
+#   * iterations: 10000
+#   * PBKDF2: HMACSHA512, 32 bytes long (stored as base64)
+#
+# When creating a password to store, randomly generate the salt and use openssl
+# to general the resultant PBKDF2 hash; convert to base64 and store.
+#
+# Reference:
+# * https://github.com/Sonarr/Sonarr/blob/develop/src/NzbDrone.Core/Authentication/UserService.cs#L123
+# * https://github.com/Sonarr/Sonarr/blob/develop/src/NzbDrone.Core/Authentication/UserService.cs#L26
+# * https://github.com/Sonarr/Sonarr/blob/develop/src/NzbDrone.Core/Authentication/UserService.cs#L45
+# * https://stackoverflow.com/questions/73483904/openssl-create-pbkdf2-key-derivation
+# * https://stackoverflow.com/questions/69036942/ansible-create-sha512-pbkdf2-hash
+# * https://cloud.magiclen.org/us/uuid
+- name: 'DB | general | security | openssl generate random salt'
+  ansible.builtin.command: 'openssl rand -base64 16'
+  register: _sonarr_db_salt
+  when: sonarr_general_security_login_user | length > 0
+
+- name: 'DB | general | security | openssl generate PBKDF2 password hash'
+  ansible.builtin.command: 'openssl kdf -keylen 32 -kdfopt digest:SHA512 -kdfopt pass:{{ sonarr_general_security_login_password }} -kdfopt salt:{{ _sonarr_db_salt.stdout | b64decode }} -kdfopt iter:10000 PBKDF2'
+  register: _sonarr_db_password_hash
+  when: sonarr_general_security_login_user | length > 0
+
+- name: 'DB | general | security | cleanup generate PBKDF2 hashes for insertion'
+  ansible.builtin.set_fact:
+    _sonarr_db_user_salt: '{{ _sonarr_db_salt.stdout }}'
+    _sonarr_db_user_password: '{{ _sonarr_db_password_hash.stdout | replace(":","") }}'
+    _sonarr_db_user_uuid: '{{ sonarr_general_security_login_user | to_uuid }}'
+  when: sonarr_general_security_login_user | length > 0
+
+- name: 'DB | general | security | user {{ sonarr_general_security_login_user }}'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_users }}
+      (
+      '{{ _sonarr_db_user_uuid }}',
+      '{{ sonarr_general_security_login_user }}',
+      '{{ _sonarr_db_user_password }}',
+      '{{ _sonarr_db_salt }}',
+      '10000'
+      );
+  when: sonarr_general_security_login_user | length > 0
+
+- name: 'DB | general | security | HTTPS certificate validation'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'certificatevalidation',
+      '{{ sonarr_general_security_cert_validation }}'
+      );
+
+- name: 'DB | general | proxy | proxy enabled'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'proxyenabled',
+      '{{ sonarr_general_proxy_enable | string | capitalize }}'
+      );
+
+- name: 'DB | general | proxy | proxy type'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'proxytype',
+      '{{ sonarr_general_proxy_type | string | capitalize }}'
+      );
+
+- name: 'DB | general | proxy | proxy hostname'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'proxyhostname',
+      '{{ sonarr_general_proxy_hostname }}'
+      );
+
+- name: 'DB | general | proxy | proxy port'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'proxyport',
+      '{{ sonarr_general_proxy_port }}'
+      );
+
+- name: 'DB | general | proxy | proxy username'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'proxyusername',
+      '{{ sonarr_general_proxy_username }}'
+      );
+
+- name: 'DB | general | proxy | proxy password'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'proxypassword',
+      '{{ sonarr_general_proxy_password }}'
+      );
+
+- name: 'DB | general | proxy | proxy bypass filters'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'proxybypassfilter',
+      '{{ sonarr_general_proxy_ignored_addresses | join(',') }}'
+      );
+
+- name: 'DB | general | proxy | proxy bypass local addresses'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'proxybypasslocaladdresses',
+      '{{ sonarr_general_proxy_bypass_local_addresses | string | capitalize }}'
+      );
+
+- name: 'DB | general | backups | backups directory'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'backupfolder',
+      '{{ sonarr_general_backups_folder }}'
+      );
+
+- name: 'DB | general | backups | backup interval'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'backupinterval',
+      '{{ sonarr_general_backups_interval }}'
+      );
+
+- name: 'DB | general | backups | backup retention'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'backupretention',
+      '{{ sonarr_general_backups_retention }}'
+      );
