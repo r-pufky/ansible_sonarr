@@ -1,0 +1,40 @@
+---
+# yamllint disable rule:line-length
+dependency:
+  name: 'galaxy'
+driver:
+  name: 'podman'
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto_silent'
+      callback_whitelist: 'profile_tasks, timer, yaml'
+    ssh_connection:
+      pipelining: false
+  inventory:
+    group_vars:
+      all:
+        sonarr_create_user: true
+        # Static API key for testing.
+        sonarr_general_security_api_key: 'AuUCGRGCqIpMLiDUzowIqzPxfdLuKFN0'
+        systemd_testing_enable: false
+        github_testing_enable: true
+        github_testing_version: 'v4.0.8.1874'
+        github_testing_archive: '../resources/files/sonarr_archive_v4.0.8.1874.tar.gz'
+platforms:
+  - name: 'debian-12'
+    image: 'ghcr.io/hifis-net/debian-systemd:12'
+    systemd: 'always'
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    capabilities:
+      - 'SYS_ADMIN'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+verifier:
+  name: 'ansible'
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .

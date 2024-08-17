@@ -1,82 +1,93 @@
 ---
 ###############################################################################
+# Sonarr Source Versions
+###############################################################################
+# Base version used for current role creation. Sonarr will auto update once
+# properly installed; revisiting role tasks is not necessary unless a major
+# version is released. Additional configuration settings may need to be added
+# to defaults for point releases.
+#
+# Reference:
+# * https://github.com/Sonarr/Sonarr/releases
+# * https://github.com/Sonarr/Sonarr/blob/develop/distribution/debian/install.sh
+
+sonarr_role_validate_release: 'v4.0.8.1874'
+sonarr_role_script_validate_release: '1.0.3'
+sonarr_role_validate_db_release: 211
+
+###############################################################################
 # Default Sonarr Package Dependencies
 ###############################################################################
 # Default required packages for Sonarr install.
 
-sonarr_default_packages:
+sonarr_role_packages:
   - 'gnupg2'
+  - 'sqlite3'
+  - 'openssl'  # PBKDF2 DB user password generation
+
+# Default state for apt package installation. See ansible.builtin.apt.
+sonarr_role_package_state: 'latest'
 
 ###############################################################################
-# Default Sonarr User Group
+# Sonarr source repository
 ###############################################################################
-# Default group settings if an Sonarr user is force created.
+# Reference:
+# * https://github.com/Sonarr/Sonarr/releases/latest
 
-sonarr_default_group:
+sonarr_role_github_owner: 'Sonarr'
+sonarr_role_github_repo: 'Sonarr'
+sonarr_role_github_repo_archive_type: 'tar.gz'
+sonarr_role_github_extract_dest: '/opt/sonarr'
+sonarr_role_github_extract_symlink_target: '/opt/sonarr/sonarr'
+
+###############################################################################
+# Default Sonarr User/Group
+###############################################################################
+
+sonarr_role_group:
   name: 'media'
-  gid:  5555
+  gid: 5555
 
-###############################################################################
-# Default Sonarr Repositories
-###############################################################################
-# Default apt repository to use if not in supported repositories.
-#
-# Reference:
-# * http://apt.sonarr.tv/debian/dists/
-
-sonarr_default_repository: 'buster'
-sonarr_supported_repositories:
-  - 'buster'
-  - 'jessie'
-  - 'stretch'
-  - 'testing'
-
-###############################################################################
-# Sonarr Mono Version
-###############################################################################
-# Default Mono library to use if not in supported libraries.
-#
-# Reference:
-# * https://download.mono-project.com/repo/debian
-
-sonarr_default_mono_library: 'stable-buster'
-sonarr_mono_supported_libraries:
-  - 'bionic'
-  - 'buster'
-  - 'focal'
-  - 'jessie'
-  - 'precise'
-  - 'raspbianbuster'
-  - 'raspbianjessie'
-  - 'raspbianstretch'
-  - 'stretch'
-  - 'trusty'
-  - 'wheezy'
-  - 'xenial'
-
-###############################################################################
-# Default Sonarr User Account
-###############################################################################
-# Default user settings if an Sonarr user is force created.
-#
-# Logins are disabled.
-
-sonarr_default_user:
-  name:            'media'
-  group:           'media'
-  uid:             5555
-  shell:           '/usr/sbin/nologin'
-  home:            '/nonexistent'
-  create_home:     false
-  password:        '!'
-  password_lock:   true
+sonarr_role_user:
+  name: 'media'
+  group: 'media'
+  uid: 5555
+  shell: '/usr/sbin/nologin'
+  home: '/nonexistent'
+  comment: '(logins disabled)'
+  create_home: false
+  password: '!'
+  password_lock: true
   update_password: 'always'
-  expires:         -1
-  system:          true
+  expires: -1
+  system: true
 
 ###############################################################################
-# Sonarr Configuration Version
+# Default Sonarr db queries
 ###############################################################################
-# Base version used for initial role creation.
+# queries used to modify db for setup.
 
-sonarr_version: '3.0.2.4552'
+sonarr_role_db: '{{ sonarr_role_github_extract_symlink_target }}/sonarr.db'
+sonarr_role_db_version: 'select max(Version) from VersionInfo'
+sonarr_role_db_config: 'insert or replace into Config(Key, Value) values'
+sonarr_role_db_users: >
+  insert or replace into Users(Identifier, Username, Password, Salt,
+  Iterations) values
+sonarr_role_db_naming_config: >
+  insert or replace into NamingConfig(MultiEpisodeStyle, RenameEpisodes,
+  StandardEpisodeFormat, DailyEpisodeFormat, SeasonFolderFormat,
+  SeriesFolderFormat, AnimeEpisodeFormat, ReplaceIllegalCharacters,
+  SpecialsFolderFormat, ColonReplacementFormat) values
+sonarr_role_db_root_folders: 'insert or replace into RootFolders(Path) values'
+sonarr_role_db_quality_definitions: >
+  insert or replace into QualityDefinitions(Id, Quality, Title, MinSize,
+  MaxSize, PreferredSize) values
+overseerr_role_user_insert: >
+  insert or replace into \"user\" (id, email, username, plexId, plexToken,
+  permissions, avatar, password, userType, plexUsername, movieQuotaLimit,
+  movieQuotaDays, tvQuotaLimit, tvQuotaDays) values
+overseerr_role_user_setting_insert: >
+  insert or replace into \"user_settings\" (notificationTypes, discordId,
+  userId, region, originalLanguage, telegramChatId, telegramSendSilently,
+  pgpKey, locale, pushbulletAccessToken, pushoverApplicationToken,
+  pushoverUserKey, watchlistSyncMovies, watchlistSyncTv) values

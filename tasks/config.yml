@@ -1,0 +1,44 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Sonarr Config
+###############################################################################
+#
+# Reference:
+# * https://github.com/Sonarr/Sonarr/blob/develop/distribution/debian/install.sh
+
+- name: 'Config | set service configuration'
+  ansible.builtin.template:
+    src: 'config.xml.j2'
+    dest: '{{ sonarr_data_dir }}/config.xml'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode: '0600'  # 0664 originally
+  notify: 'Handlers | restart sonarr'
+
+- name: 'Config | sonarr service'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.systemd'
+  vars:
+    systemd_services:
+      - name: 'sonarr'
+        unit:
+          description: 'Sonarr Daemon'
+          after:
+            - 'network.target'
+        service:
+          type: 'simple'
+          exec_start: ['{{ sonarr_role_github_extract_symlink_target }}/Sonarr -nobrowser -data={{ sonarr_data_dir }}']
+          timeout_stop_sec: 20
+          restart: 'on-failure'
+          runtime_max_sec: '{% if sonarr_restart_daily %}1d{% else %}infinity{% endif %}'
+        exec:
+          user: '{{ sonarr_user }}'
+          group: '{{ sonarr_group }}'
+          u_mask: '002'
+        kill:
+          kill_mode: 'process'
+        install:
+          wanted_by:
+            - 'multi-user.target'
+        state: 'present'

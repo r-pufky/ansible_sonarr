@@ -1,0 +1,273 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Settings ➤ Media Management
+###############################################################################
+
+- name: 'DB | media management | episode naming | naming config'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_naming_config }}
+      (
+      '{{ sonarr_media_naming_multi_episode_style | int }}',
+      '{{ sonarr_media_naming_rename_episodes_enable | int }}',
+      '{{ sonarr_media_naming_standard_episode_format }}',
+      '{{ sonarr_media_naming_daily_episode_format }}',
+      '{{ sonarr_media_naming_season_folder_format }}',
+      '{{ sonarr_media_naming_series_folder_format }}',
+      '{{ sonarr_media_naming_anime_episode_format }}',
+      '{{ sonarr_media_naming_replace_illegal_characters_enable | int }}',
+      '{{ sonarr_media_naming_specials_folder_format }}',
+      '{{ sonarr_media_naming_colon_replacement | int }}'
+      );
+
+- name: 'DB | media management | folders | create empty series folders'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'createemptyseriesfolders',
+      '{{ sonarr_media_folders_create_empty_series_folders_enable | string | capitalize }}'
+      );
+
+- name: 'DB | media management | folders | delete empty folders'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'deleteemptyfolders',
+      '{{ sonarr_media_folders_delete_empty_folders_enable | string | capitalize }}'
+      );
+
+- name: 'DB | media management | importing | episode title required'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'episodetitlerequired',
+      '{{ sonarr_media_importing_episode_title_required }}'
+      );
+
+- name: 'DB | media management | importing | set free space check'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'skipfreespacecheckwhenimporting',
+      '{{ sonarr_media_importing_skip_free_space_check_enable | string | capitalize }}'
+      );
+
+- name: 'DB | media management | importing | set minimum free space'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'minimumfreespacewhenimporting',
+      '{{ sonarr_media_importing_minimum_free_space | int }}'
+      );
+
+- name: 'DB | media management | importing | set use hardlinks'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'copyusinghardlinks',
+      '{{ sonarr_media_importing_use_hardlinks_instead_of_copy_enable | string | capitalize }}'
+      );
+
+- name: 'DB | media management | importing | import using script'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'usescriptimport',
+      '{{ sonarr_media_importing_import_using_script_enable | string | capitalize }}'
+      );
+
+- name: 'DB | media management | importing | path to import script'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'scriptimportpath',
+      '{{ sonarr_media_importing_import_script_path }}'
+      );
+
+- name: 'DB | media management | importing | import matching extra files'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'importextrafiles',
+      '{{ sonarr_media_importing_import_extra_files_enable | string | capitalize }}'
+      );
+
+- name: 'DB | media management | importing | extra files to use'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'extrafileextensions',
+      '{{ sonarr_media_importing_import_extra_files | join(',') }}'
+      );
+
+- name: 'DB | media management | file management | auto unmonitor deleted episodes'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'autounmonitorpreviouslydownloadedepisodes',
+      '{{ sonarr_media_file_unmonitor_deleted_episodes_enable | string | capitalize }}'
+      );
+
+- name: 'DB | media management | file management | upgrade propers and repacks'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'downloadpropersandrepacks',
+      '{{ sonarr_media_file_propers_and_repacks }}'
+      );
+
+- name: 'DB | media management | file management | analyze video files'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'enablemediainfo',
+      '{{ sonarr_media_file_analyse_video_files_enable | string | capitalize }}'
+      );
+
+- name: 'DB | media management | file management | rescan series folders'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'rescanafterrefresh',
+      '{{ sonarr_media_file_rescan_series_folder_after_refresh }}'
+      );
+
+- name: 'DB | media management | file management | change file date on import'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'filedate',
+      '{{ sonarr_media_file_change_file_date }}'
+      );
+
+- name: 'DB | media management | file management | recycle bin'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'recyclebin',
+      '{{ sonarr_media_file_recycling_bin }}'
+      );
+
+- name: 'DB | media management | file management | recycle bin cleanup'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'recyclebincleanupdays',
+      '{{ sonarr_media_file_recycling_bin_cleanup | int }}'
+      );
+
+- name: 'DB | media management | file management | import file octal permissions'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'chmodfolder',
+      '{{ sonarr_media_perms_chmod_folder }}'
+      );
+
+- name: 'DB | media management | file management | import file octal group'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_config }}
+      (
+      'chowngroup',
+      '{{ sonarr_media_perms_chown_group }}'
+      );
+
+- name: 'DB | media management | root folders | clear folders'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: 'delete from RootFolders;'
+  when: sonarr_media_root_folders | length > 0
+
+- name: 'DB | media management | root folders | storage folders'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.sqlite'
+  vars:
+    sqlite_db: '{{ sonarr_role_db }}'
+    sqlite_sql: >-
+      {{ sonarr_role_db_root_folders }}
+      (
+      '{{ item }}'
+      );
+  loop: '{{ sonarr_media_root_folders }}'

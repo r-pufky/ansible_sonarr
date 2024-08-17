@@ -1,0 +1,55 @@
+---
+###############################################################################
+# Sonarr Prep
+###############################################################################
+# Prep sonarr variables for installation and upgrade.
+
+- name: 'Prep | assert certificate requirements'
+  ansible.builtin.assert:
+    that:
+      - sonarr_general_host_ssl_cert_path | length > 0
+  when: sonarr_general_host_ssl_enable
+
+- name: 'Prep | detect running services'
+  ansible.builtin.service_facts:
+
+- name: 'Prep | detect apt packages (<V4 releases)'
+  ansible.builtin.package_facts:
+  when: not sonarr_force_config_only
+
+- name: 'Prep | create role account'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.users'
+    tasks_from: 'role_account_add'
+  vars:
+    users_role_user:
+      name: '{{ sonarr_role_user.name }}'
+      group: '{{ sonarr_role_user.group }}'
+      uid: '{{ sonarr_role_user.uid }}'
+      shell: '{{ sonarr_role_user.shell }}'
+      home: '{{ sonarr_role_user.home }}'
+      comment: '{{ sonarr_role_user.comment }}'
+      create_home: '{{ sonarr_role_user.create_home }}'
+      password: '{{ sonarr_role_user.password }}'
+      password_lock: '{{ sonarr_role_user.password_lock }}'
+      update_password: '{{ sonarr_role_user.update_password }}'
+      expires: '{{ sonarr_role_user.expires }}'
+      system: '{{ sonarr_role_user.system }}'
+    users_role_group:
+      name: '{{ sonarr_role_group.name }}'
+      gid: '{{ sonarr_role_group.gid }}'
+  when: sonarr_create_user
+
+- name: 'Prep | stop sonarr service'
+  ansible.builtin.systemd:
+    name: 'sonarr'
+    state: 'stopped'
+  when: '"sonarr.service" in services'
+
+- name: 'Prep | set sonarr data dir {{ sonarr_data_dir }}'
+  ansible.builtin.file:
+    path: '{{ sonarr_data_dir }}'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode: '0755'
+    state: 'directory'

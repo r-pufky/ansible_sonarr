@@ -1,94 +1,30 @@
 ---
-###############################################################################
-# Sonarr Install
-###############################################################################
-# Sonarr v3
+- name: 'Main | prep'
+  ansible.builtin.include_tasks: prep.yml
+
+- name: 'Main | migrate'
+  ansible.builtin.include_tasks: migrate/v3_to_v4.yml
+  when: >
+    'sonarr' in ansible_facts.packages and
+    not sonarr_force_config_only
+
+- name: 'Main | packages'
+  ansible.builtin.include_tasks: packages.yml
+  when: not sonarr_force_config_only
+
+- name: 'Main | install'
+  ansible.builtin.include_tasks: install.yml
+  when: not sonarr_force_config_only
+
+# Instead of DB, use REST API with
 #
-# Reference:
-# * https://sonarr.tv/#downloads-v3-linux
-
-- ansible.builtin.include_tasks: manage_users.yml
-
-- name: 'install | install dependencies'
-  ansible.builtin.apt:
-    name:  '{{ sonarr_default_packages }}'
-    state: 'latest'
-    update_cache: true
-
-- name: 'install | add sonarr repo key'
-  ansible.builtin.apt_key:
-    keyserver: 'hkp://keyserver.ubuntu.com:80'
-    id:        '2009837CBFFD68F45BC180471F4F90DE2A9B4BF8'
-    state:     'present'
-
-- name: 'install | set version'
-  ansible.builtin.set_fact:
-    _sonarr_mono_version: '{% if ansible_distribution_release is not in sonarr_mono_supported_libraries %}{{ sonarr_default_mono_library }}{% else %}stable-{{ ansible_distribution_release }}{% endif %}'
-    _sonarr_repo: '{% if ansible_distribution_release is not in sonarr_supported_repositories %}{{ sonarr_default_repository }}{% else %}{{ ansible_distribution_release }}{% endif %}'
-
-- name: 'install | add sonarr repo'
-  ansible.builtin.apt_repository:
-    repo:     'deb https://apt.sonarr.tv/debian {{ _sonarr_repo }} main'
-    filename: 'sonarr'
-    state:    'present'
-    update_cache: true
-
-# Mono is included in the sonarr repo, however this will install the
-# latest version directly from the mono repo.
-- name: 'install | add mono repo key'
-  ansible.builtin.apt_key:
-    keyserver: 'hkp://keyserver.ubuntu.com:80'
-    id:        '3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF'
-    state:     'present'
-
-- name: 'install | add mono repo'
-  ansible.builtin.apt_repository:
-    repo:     'deb https://download.mono-project.com/repo/debian {{ _sonarr_mono_version }} main'
-    filename: 'mono'
-    state:    'present'
-    update_cache: true
-
-- name: 'install | preconfigure sonarr group'
-  ansible.builtin.debconf:
-    name:     'sonarr'
-    question: 'sonarr/owning_group'
-    value:    '{{ sonarr_group }}'
-    vtype:    'string'
-
-- name: 'install | preconfigure sonarr user'
-  ansible.builtin.debconf:
-    name:     'sonarr'
-    question: 'sonarr/owning_user'
-    value:    '{{ sonarr_user }}'
-    vtype:    'string'
-
-- name: 'install | preconfigure sonarr directory'
-  ansible.builtin.debconf:
-    name:     'sonarr'
-    question: 'sonarr/config_directory'
-    value:    '{{ sonarr_dir }}'
-    vtype:    'string'
-
-- name: 'install | install'
-  ansible.builtin.apt:
-    name:  'sonarr'
-    state: 'latest'
-    update_cache: true
-  notify: 'restart sonarr'
-
-- name: 'install | set configuration'
-  ansible.builtin.template:
-    src:   'config.xml.j2'
-    dest:  '/var/lib/sonarr/config.xml'
-    owner: '{{ sonarr_user }}'
-    group: '{{ sonarr_group }}'
-    mode:  0600 #0664 originally
-  notify: 'restart sonarr'
-
-- name: 'install | restart sonarr service daily'
-  ansible.builtin.cron:
-    name:         'restart sonarr service daily'
-    special_time: 'daily'
-    user:         'root'
-    job:          'service sonarr restart'
-    state:        'present'
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html
+# https://sonarr.tv/docs/api/#/QualityProfile/get_api_v3_qualityprofile
+#
+# And *ONLY* apply direct DB updates if it is needed and not REST accessible.
+#
+# Test role up to DB configuration first.
+# - name: 'Main | db'
+#   ansible.builtin.include_tasks: db/main.yml
+- name: 'Main | config'
+  ansible.builtin.include_tasks: config.yml

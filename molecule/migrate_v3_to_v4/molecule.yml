@@ -1,0 +1,60 @@
+---
+# yamllint disable rule:line-length
+dependency:
+  name: 'galaxy'
+driver:
+  name: 'podman'
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto_silent'
+      callback_whitelist: 'profile_tasks, timer, yaml'
+    ssh_connection:
+      pipelining: false
+  inventory:
+    group_vars:
+      all:
+        # V3 prepare setup
+        sonarr_create_user: true
+        sonarr_role_group:
+          name: 'media'
+          gid: 5555
+        sonarr_role_user:
+          name: 'media'
+          group: 'media'
+          uid: 5555
+          shell: '/usr/sbin/nologin'
+          home: '/nonexistent'
+          comment: '(logins disabled)'
+          create_home: false
+          password: '!'
+          password_lock: true
+          update_password: 'always'
+          expires: -1
+          system: true
+        sonarr_user: 'media'
+        sonarr_group: 'media'
+        # Static API key for testing.
+        sonarr_general_security_api_key: 'AuUCGRGCqIpMLiDUzowIqzPxfdLuKFN0'
+        # V4 migration
+        systemd_testing_enable: false
+        github_testing_enable: true
+        github_testing_version: 'v4.0.8.1874'
+        github_testing_archive: '../resources/files/sonarr_archive_v4.0.8.1874.tar.gz'
+platforms:
+  - name: 'debian-11'
+    image: 'ghcr.io/hifis-net/debian-systemd:11'
+    systemd: 'always'
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    capabilities:
+      - 'SYS_ADMIN'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+verifier:
+  name: 'ansible'
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
