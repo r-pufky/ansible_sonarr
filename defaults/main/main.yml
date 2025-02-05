@@ -1,42 +1,121 @@
 ---
+# yamllint disable rule:line-length
 ###############################################################################
 # Sonarr Role Configuration
 ###############################################################################
-# User that sonarr will run under. Assumes externally managed.
+
+# Version.
+#
+# Older versions (<4) are not supported.
+#
+# Values:
+#   {VERSION}: tagged release to use ('v4.0.8.1874').
+#    'latest': use latest stable release.
+#
+# Default: 'latest'.
+sonarr_service_version: 'latest'
+
+# Remove old installs on upgrade success? Default: True.
+sonarr_service_delete_old_versions_enable: true
+
+# Absolute path to database and metadata location. Default: '/var/lib/sonarr'.
+sonarr_service_data_dir: '/var/lib/sonarr'
+
+# Service Umask. Default: '002'
+sonarr_service_u_mask: '002'
+
+# Force overwrite existing install?
+#
+# DATA DESTRUCTIVE.
+#
+# Removes existing cached downloaded archives and existing same-version install
+# directories (if any). Any user data in these directories are DESTROYED.
+#
+# Default: False.
+sonarr_service_force_overwrite: false
+
+# Automatically restart Sonarr daily?
+#
+# Restarting the Sonarr service will automatically apply any downloaded auto
+# updates.
+#
+# Default: True.
+sonarr_service_restart_daily_enable: true
+
+# Only apply configuration?
+#
+# Reduces role application time by ONLY applying configuration changes. Does
+# NOT affect sonarr_media_set_perms_file_enable.
+#
+# This should ONLY be used after the role has been fully run once.
+#
+# Useful when adding a change without reconfiguring the whole system or
+# checking and installing a new version. Suggest applying with extra options:
+#
+#   ansible-playbook site.yml --tags Sonarr -e 'sonarr_service_force_config_only_enable=true'
+#
+# Default: False.
+sonarr_service_force_config_only_enable: false
+
+###############################################################################
+# Sonarr User
+###############################################################################
+
+# User that Sonarr will run under.
+#
+# Enable sonarr_create_user if this account is not externally managed.
+#
+# Default: 'media'.
 sonarr_user: 'media'
+
+# Group that Sonarr will run under.
+#
+# Enable sonarr_create_user if this group is not externally managed.
+#
+# Default: 'media'.
 sonarr_group: 'media'
 
-# Create 'media' user if not detected? See: vars/main.yml.
-sonarr_create_user: false
-
-# Installation directory
-sonarr_dir: '/var/lib/sonarr'
-
-# Staging directory for backups
-sonarr_staging: '/var/lib/sonarr-staging'
-
-# Target location of backup file on ansible host.
-sonarr_local_backup: 'host_vars/data/sonarr-config.tar.gz'
+# Create sonarr_user, sonarr_group if not detected?
+#
+# Applied via r_pufky.srv.users, see vars/main.yml for default user attributes.
+#
+# Default: True.
+sonarr_create_user: true
 
 ###############################################################################
-# Sonarr config.xml Configuration
+# Media Permissions
 ###############################################################################
 
-sonarr_port: '8989'  # http port
-sonarr_bind_address: '*'
-# Sonarr requires ssl port to be defined even if unused
-sonarr_ssl_port: '9898'  # https port
-sonarr_enable_ssl: false
-sonarr_api_key: ''
-sonarr_authentication_method: 'None'
-sonarr_log_level: 'info'
-# Default: undefined
-sonarr_launch_browser: false
-sonarr_branch: 'main'
-sonarr_ssl_cert_hash: ''
-sonarr_update_mechanism: 'BuiltIn'
-# Default: undefined
-sonarr_analytics_enabled: false
-# Default: undefined
-sonarr_update_automatically: false
-sonarr_url_base: ''
+# Root media storage folders.
+#
+# Folders will be created/set with sonarr_user, sonarr_group,
+# sonarr_media_perms_folder.
+#
+# Default: [].
+sonarr_media_root_folders: []
+
+# Media folder permissions octal.
+#
+# Media folders specified by sonarr_media_root_folders will always be
+# recursively set using sonarr_media_perms_folder, sonarr_user, and
+# sonarr_group.
+#
+# Default: '0755'.
+sonarr_media_perms_folder: '0755'
+
+# Enable setting of media file permissions?
+#
+# Set file permissions within sonarr_media_root_folders using
+# sonarr_media_perms_file, sonarr_user, and sonarr_group. Large sets of files
+# may be slow to set permissions.
+#
+# Useful when first configuring to ensure service has access to all specified
+# media locations. Suggest applying with extra options:
+#
+#   ansible-playbook site.yml --tags Sonarr -e 'sonarr_media_set_perms_file_enable=true'
+#
+# Default: False.
+sonarr_media_set_perms_file_enable: false
+
+# Media file permissions octal. Default: '0644'.
+sonarr_media_perms_file: '0644'

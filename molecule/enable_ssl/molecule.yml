@@ -1,13 +1,26 @@
 ---
 # yamllint disable rule:line-length
+#
+# Testing requires a valid PFX certificate. This has been created and is valid
+# for 10 years (all default values, password: 'test'):
+#
+# * openssl req -new -newkey rsa:4096 -nodes -keyout test.key -out test.csr
+# * openssl x509 -req -sha256 -days 3650 -in test.csr -signkey test.key -out test.pem
+# * openssl pkcs12 -export -in test.pem -inkey test.key -out test.pfx
+#
+# Place in files/test.pfx
+#
+# Reference:
+# * https://gist.github.com/rquackenbush/53ff432567699b21c86f3360fb4ec7f0
+#
 # Confirm:
-# * config.xml set.
-# * sonarr.service active and running.
-# * /var/lib/sonarr created with correct permissions.
-# * /data/media created with correct permissions.
-# * /data/media - file permissions recursively set with correct permissions.
-# * /var/lib/sonarr/update_script does not exist.
-# * /var/lib/sonarr/sonarr.pfx does not exist.
+# * /var/lib/sonarr/sonarr.pfx exists.
+# * toggling ssl on, then off removes sonarr.pfx.
+
+#  <EnableSsl>False</EnableSsl>  # true requires ssl_cert
+#  <SslCertPath>/var/lib/sonarr/snakeoil.pfx</SslCertPath>
+#  <SslCertPassword>testing</SslCertPassword>  # stored plaintext.
+# sonarr_config_enable_ssl -- test when false w and w/o cert
 dependency:
   name: 'galaxy'
 driver:
@@ -23,13 +36,23 @@ provisioner:
   inventory:
     group_vars:
       all:
+        sonarr_config_enable_ssl: true
+        sonarr_config_ssl_cert_path: 'files/test.pfx'
+        sonarr_config_ssl_cert_password: 'test'
         sonarr_media_root_folders: ['/data/media']
         sonarr_config_api_key: 'b927471037e916e6dac796933c13fdbc'
         github_testing_enable: true
         github_testing_version: 'v4.0.12.2823'
         github_testing_archive: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
 platforms:
-  - name: 'sonarr-debian-12-default'
+  - name: 'sonarr-debian-12-enable_ssl'
+    image: 'ghcr.io/hifis-net/debian-systemd:12'
+    systemd: 'always'
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+  - name: 'sonarr-debian-12-enable_ssl-toggle'
     image: 'ghcr.io/hifis-net/debian-systemd:12'
     systemd: 'always'
     volumes:

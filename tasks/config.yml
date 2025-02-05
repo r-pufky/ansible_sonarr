@@ -3,42 +3,129 @@
 ###############################################################################
 # Sonarr Config
 ###############################################################################
+# Sonarr is installed from source. Create systemd service and reload daemons,
+# create required directories, certificates, set config, and start service.
+# Service may not exist if first install.
+#
+# New config.xml options must be manually added to the template.
+#
+# Args:
+#   _sonarr_uid: int - sonarr user UID.
+#   _sonarr_gid: int - sonarr user GID.
 #
 # Reference:
 # * https://github.com/Sonarr/Sonarr/blob/develop/distribution/debian/install.sh
+# * https://github.com/Sonarr/Sonarr/blob/main/distribution/debian/sonarr.service
 
-- name: 'Config | set service configuration'
-  ansible.builtin.template:
-    src: 'config.xml.j2'
-    dest: '{{ sonarr_data_dir }}/config.xml'
-    owner: '{{ sonarr_user }}'
-    group: '{{ sonarr_group }}'
-    mode: '0600'  # 0664 originally
-  notify: 'Handlers | restart sonarr'
-
-- name: 'Config | sonarr service'
+- name: 'Config | Sonarr service'
   ansible.builtin.include_role:
     name: 'r_pufky.srv.systemd'
   vars:
+    systemd_daemon_reload_enable: true
     systemd_services:
       - name: 'sonarr'
+        state: 'present'
+        drop_in: false
         unit:
           description: 'Sonarr Daemon'
           after:
             - 'network.target'
         service:
           type: 'simple'
-          exec_start: ['{{ sonarr_role_github_extract_symlink_target }}/Sonarr -nobrowser -data={{ sonarr_data_dir }}']
+          exec_start: ['{{ sonarr_role_github_extract_symlink_target }}/Sonarr -nobrowser -data={{ sonarr_service_data_dir }}']
           timeout_stop_sec: 20
-          restart: 'on-failure'
-          runtime_max_sec: '{% if sonarr_restart_daily %}1d{% else %}infinity{% endif %}'
+          restart: 'always'  # always restart for periodic service restarts
+          runtime_max_sec: '{{ "1d" if sonarr_service_restart_daily_enable else "infinity" }}'
         exec:
           user: '{{ sonarr_user }}'
           group: '{{ sonarr_group }}'
-          u_mask: '002'
+          u_mask: '{{ sonarr_service_u_mask }}'
         kill:
           kill_mode: 'process'
         install:
           wanted_by:
             - 'multi-user.target'
-        state: 'present'
+
+- name: 'Config | stop Sonarr'
+  ansible.builtin.service:
+    name: 'sonarr'
+    state: 'stopped'
+
+- name: 'Prep | set {{ sonarr_service_data_dir }}'
+  ansible.builtin.file:
+    path: '{{ sonarr_service_data_dir }}'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode: '0775'
+    recurse: true
+    state: 'directory'
+  become: true
+
+- name: 'Prep | set {{ sonarr_service_data_dir }}/sonarr.pfx'  # noqa name[template] full path
+  when: sonarr_config_enable_ssl
+  ansible.builtin.copy:
+    src: '{{ sonarr_config_ssl_cert_path }}'
+    dest: '{{ sonarr_service_data_dir }}/sonarr.pfx'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode: '0640'
+    force: true
+
+- name: 'Prep | remove {{ sonarr_service_data_dir }}/sonarr.pfx'  # noqa name[template] full path
+  when: not sonarr_config_enable_ssl
+  ansible.builtin.file:
+    dest: '{{ sonarr_service_data_dir }}/sonarr.pfx'
+    state: 'absent'
+
+- name: 'Prep | set {{ sonarr_service_data_dir }}/update_script'  # noqa name[template] full path
+  when: not sonarr_config_update_mechanism
+  ansible.builtin.copy:
+    src: '{{ sonarr_config_update_script_path }}'
+    dest: '{{ sonarr_service_data_dir }}/update_script'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode: '0750'
+    force: true
+
+- name: 'Prep | remove {{ sonarr_service_data_dir }}/update_script'  # noqa name[template] full path
+  when: sonarr_config_update_mechanism
+  ansible.builtin.file:
+    dest: '{{ sonarr_service_data_dir }}/update_script'
+    state: 'absent'
+
+# Use UID/GID as some media filesystems may be remote.
+- name: 'Prep | set media root folders'
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: '{{ _sonarr_uid }}'
+    group: '{{ _sonarr_gid }}'
+    mode: '{{ sonarr_media_perms_folder }}'
+    recurse: true
+    state: 'directory'
+  become: true
+  loop: '{{ sonarr_media_root_folders }}'
+
+# Use UID/GID as some media filesystems may be remote.
+- name: 'Prep | set media root files'
+  when: sonarr_media_set_perms_file_enable
+  ansible.builtin.shell: |
+    find '{{ item }}' -type f -exec chmod {{ sonarr_media_perms_file }} {}; chown {{ _sonarr_uid }}:{{ _sonarr_gid }} {} \;
+  changed_when: false
+  loop: '{{ sonarr_media_root_folders }}'
+
+# Writing the configuration back requires to_json, ansible.utils.to_xml, and
+# xmltodict python3 package installed on both controller and node. Just use a
+# template instead.
+- name: 'Config | set Sonarr configuration'
+  ansible.builtin.template:
+    src: 'config.xml.j2'
+    dest: '{{ sonarr_service_data_dir }}/config.xml'
+    owner: '{{ sonarr_user }}'
+    group: '{{ sonarr_group }}'
+    mode: '0600'
+  notify: 'Handlers | restart sonarr'
+
+- name: 'Config | start Sonarr'
+  ansible.builtin.service:
+    name: 'sonarr'
+    state: 'started'

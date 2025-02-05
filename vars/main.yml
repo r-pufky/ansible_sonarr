@@ -1,6 +1,7 @@
 ---
+# yamllint disable rule:line-length
 ###############################################################################
-# Sonarr Source Versions
+# Sonarr Role Options
 ###############################################################################
 # Base version used for current role creation. Sonarr will auto update once
 # properly installed; revisiting role tasks is not necessary unless a major
@@ -8,28 +9,28 @@
 # to defaults for point releases.
 #
 # Reference:
+# * https://github.com/Sonarr/Sonarr/blob/main/distribution/debian/install.sh
 # * https://github.com/Sonarr/Sonarr/releases
-# * https://github.com/Sonarr/Sonarr/blob/develop/distribution/debian/install.sh
 
-sonarr_role_validate_release: 'v4.0.8.1874'
-sonarr_role_script_validate_release: '1.0.3'
-sonarr_role_validate_db_release: 211
+# Last time Sonarr options were validated against a default configuration.
+sonarr_role_validate_date: '2024-08-18'
+sonarr_role_validate_release: 'bookworm'
+sonarr_role_validate_version: 'v4.0.12.2823'
+sonarr_role_validate_script_release: '1.0.3'
+sonarr_role_validate_script_date: '2024-01-06'
 
 ###############################################################################
-# Default Sonarr Package Dependencies
+# APT Packages
 ###############################################################################
-# Default required packages for Sonarr install.
 
 sonarr_role_packages:
-  - 'gnupg2'
-  - 'sqlite3'
-  - 'openssl'  # PBKDF2 DB user password generation
-
-# Default state for apt package installation. See ansible.builtin.apt.
-sonarr_role_package_state: 'latest'
+  - 'sqlite3'  # Sonarr DB.
+  - 'gnupg2'  # GPG for certificates.
+  - 'ca-certificates'  # up to date certificates for certificate validation.
+  - 'libicu72'  # International Unicode support for .NET.
 
 ###############################################################################
-# Sonarr source repository
+# Sonarr GitHub Options
 ###############################################################################
 # Reference:
 # * https://github.com/Sonarr/Sonarr/releases/latest
@@ -54,40 +55,9 @@ sonarr_role_user:
   uid: 5555
   shell: '/usr/sbin/nologin'
   home: '/nonexistent'
-  comment: '(logins disabled)'
   create_home: false
   password: '!'
   password_lock: true
   update_password: 'always'
   expires: -1
   system: true
-
-###############################################################################
-# Default Sonarr db queries
-###############################################################################
-# queries used to modify db for setup.
-
-sonarr_role_db: '{{ sonarr_role_github_extract_symlink_target }}/sonarr.db'
-sonarr_role_db_version: 'select max(Version) from VersionInfo'
-sonarr_role_db_config: 'insert or replace into Config(Key, Value) values'
-sonarr_role_db_users: >
-  insert or replace into Users(Identifier, Username, Password, Salt,
-  Iterations) values
-sonarr_role_db_naming_config: >
-  insert or replace into NamingConfig(MultiEpisodeStyle, RenameEpisodes,
-  StandardEpisodeFormat, DailyEpisodeFormat, SeasonFolderFormat,
-  SeriesFolderFormat, AnimeEpisodeFormat, ReplaceIllegalCharacters,
-  SpecialsFolderFormat, ColonReplacementFormat) values
-sonarr_role_db_root_folders: 'insert or replace into RootFolders(Path) values'
-sonarr_role_db_quality_definitions: >
-  insert or replace into QualityDefinitions(Id, Quality, Title, MinSize,
-  MaxSize, PreferredSize) values
-overseerr_role_user_insert: >
-  insert or replace into \"user\" (id, email, username, plexId, plexToken,
-  permissions, avatar, password, userType, plexUsername, movieQuotaLimit,
-  movieQuotaDays, tvQuotaLimit, tvQuotaDays) values
-overseerr_role_user_setting_insert: >
-  insert or replace into \"user_settings\" (notificationTypes, discordId,
-  userId, region, originalLanguage, telegramChatId, telegramSendSilently,
-  pgpKey, locale, pushbulletAccessToken, pushoverApplicationToken,
-  pushoverUserKey, watchlistSyncMovies, watchlistSyncTv) values

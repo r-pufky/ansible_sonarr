@@ -1,13 +1,8 @@
 ---
 # yamllint disable rule:line-length
 # Confirm:
-# * config.xml set.
-# * sonarr.service active and running.
-# * /var/lib/sonarr created with correct permissions.
-# * /data/media created with correct permissions.
-# * /data/media - file permissions recursively set with correct permissions.
-# * /var/lib/sonarr/update_script does not exist.
-# * /var/lib/sonarr/sonarr.pfx does not exist.
+# * /var/lib/sonarr/update_script exists.
+# * toggling script update on, then off removes update_script.
 dependency:
   name: 'galaxy'
 driver:
@@ -23,13 +18,22 @@ provisioner:
   inventory:
     group_vars:
       all:
+        sonarr_config_update_mechanism: false
+        sonarr_config_update_script_path: 'files/update.sh'
         sonarr_media_root_folders: ['/data/media']
         sonarr_config_api_key: 'b927471037e916e6dac796933c13fdbc'
         github_testing_enable: true
         github_testing_version: 'v4.0.12.2823'
         github_testing_archive: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
 platforms:
-  - name: 'sonarr-debian-12-default'
+  - name: 'sonarr-debian-12-update_mechanisms'
+    image: 'ghcr.io/hifis-net/debian-systemd:12'
+    systemd: 'always'
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+  - name: 'sonarr-debian-12-update_mechanisms-toggle'
     image: 'ghcr.io/hifis-net/debian-systemd:12'
     systemd: 'always'
     volumes:
