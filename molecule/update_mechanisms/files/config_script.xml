@@ -1,0 +1,22 @@
+<Config>
+  <BindAddress>*</BindAddress>
+  <Port>8989</Port>
+  <UrlBase></UrlBase>
+  <InstanceName>Sonarr</InstanceName>
+  <EnableSsl>False</EnableSsl>
+  <SslPort>9898</SslPort>
+  <SslCertPath></SslCertPath>
+  <SslCertPassword></SslCertPassword>
+  <AuthenticationMethod>Forms</AuthenticationMethod>
+  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
+  <ApiKey>b927471037e916e6dac796933c13fdbc</ApiKey>
+  <LogLevel>info</LogLevel>
+  <LogSizeLimit>1</LogSizeLimit>
+  <AnalyticsEnabled>False</AnalyticsEnabled>
+  <Branch>main</Branch>
+  <UpdateAutomatically>False</UpdateAutomatically>
+  <UpdateMechanism>Script</UpdateMechanism>
+  <UpdateScriptPath>/var/lib/sonarr/update_script</UpdateScriptPath>
+  <LaunchBrowser>False</LaunchBrowser>
+  <Theme>auto</Theme>
+</Config>

@@ -1,7 +1,5 @@
 ---
 collections:
-  # https://docs.ansible.com/ansible/latest/collections/community/general/
-  - community.general  # archive
-  - r_pufky.srv  # users, github, systemd, sqlite
+  - 'r_pufky.srv'  # https://github.com/r-pufky/ansible_collection_srv
 
 roles: []

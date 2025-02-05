@@ -1,55 +1,94 @@
 ---
+# yamllint disable rule:line-length
 ###############################################################################
 # Sonarr Prep
 ###############################################################################
-# Prep sonarr variables for installation and upgrade.
+# Prep Sonarr variables for installation and upgrade.
+#
+# Generates:
+#   _sonarr_uid: int - sonarr user UID.
+#   _sonarr_gid: int - sonarr user GID.
+#
+# Reference:
+# * https://sonarr.tv/#home
+# * https://wiki.servarr.com/sonarr
+# * https://github.com/Sonarr/Sonarr/releases
+# * https://wiki.servarr.com/en/sonarr/settings
+# * https://github.com/Sonarr/Sonarr/blob/main/distribution/debian/install.sh
 
-- name: 'Prep | assert certificate requirements'
+- name: 'Prep | assert SSL requirements'
+  when: sonarr_config_enable_ssl
   ansible.builtin.assert:
     that:
-      - sonarr_general_host_ssl_cert_path | length > 0
-  when: sonarr_general_host_ssl_enable
+      - sonarr_config_ssl_cert_path | length > 0
+    fail_msg: >
+      sonarr_config_enable_ssl=true requires
+      sonarr_config_ssl_cert_path set.
 
-- name: 'Prep | detect running services'
-  ansible.builtin.service_facts:
+- name: 'Prep | assert update script requirements'
+  when: not sonarr_config_update_mechanism
+  ansible.builtin.assert:
+    that:
+      - sonarr_config_update_script_path | length > 0
+    fail_msg: >
+      sonarr_config_update_script_path must be set when
+      sonarr_config_update_mechanism=False.
 
-- name: 'Prep | detect apt packages (<V4 releases)'
-  ansible.builtin.package_facts:
-  when: not sonarr_force_config_only
-
-- name: 'Prep | create role account'
+- name: 'Prep | manage users'
+  when: sonarr_create_user
   ansible.builtin.include_role:
     name: 'r_pufky.srv.users'
-    tasks_from: 'role_account_add'
+    tasks_from: 'role_account_add.yml'
   vars:
-    users_role_user:
-      name: '{{ sonarr_role_user.name }}'
-      group: '{{ sonarr_role_user.group }}'
-      uid: '{{ sonarr_role_user.uid }}'
-      shell: '{{ sonarr_role_user.shell }}'
-      home: '{{ sonarr_role_user.home }}'
-      comment: '{{ sonarr_role_user.comment }}'
-      create_home: '{{ sonarr_role_user.create_home }}'
-      password: '{{ sonarr_role_user.password }}'
-      password_lock: '{{ sonarr_role_user.password_lock }}'
-      update_password: '{{ sonarr_role_user.update_password }}'
-      expires: '{{ sonarr_role_user.expires }}'
-      system: '{{ sonarr_role_user.system }}'
-    users_role_group:
-      name: '{{ sonarr_role_group.name }}'
-      gid: '{{ sonarr_role_group.gid }}'
-  when: sonarr_create_user
+    users_role_group: '{{ sonarr_role_group }}'
+    users_role_user: '{{ sonarr_role_user }}'
 
-- name: 'Prep | stop sonarr service'
-  ansible.builtin.systemd:
-    name: 'sonarr'
-    state: 'stopped'
-  when: '"sonarr.service" in services'
+- name: 'Prep | enumerate system user {{ sonarr_user }}'
+  ansible.builtin.user:
+    name: '{{ sonarr_user }}'
+  check_mode: true
+  changed_when: false
+  register: _sonarr_user_query
 
-- name: 'Prep | set sonarr data dir {{ sonarr_data_dir }}'
-  ansible.builtin.file:
-    path: '{{ sonarr_data_dir }}'
-    owner: '{{ sonarr_user }}'
-    group: '{{ sonarr_group }}'
-    mode: '0755'
-    state: 'directory'
+- name: 'Prep | save system user UID/GID'
+  ansible.builtin.set_fact:
+    _sonarr_uid: '{{ _sonarr_user_query.uid }}'
+    _sonarr_gid: '{{ _sonarr_user_query.group }}'
+
+# Sonarr does not consistently apply casing to XML settings and are frequently
+# mis-spelled, inconsistently spelled, ordered, or strings used for boolean
+# values; so we have to explicitly map those settings to the equivalent role
+# settings. Order does not matter but will change based on WebUI usage and what
+# values were changed last. This can lead to 'changed' configurations when no
+# values were actually changed.
+- name: 'Prep | build base config'
+  ansible.builtin.set_fact:
+    _sonarr_config: {
+      # General
+      BindAddress: '{{ sonarr_config_bind_address | default("*") }}',
+      Port: '{{ sonarr_config_port | default(8989) }}',
+      UrlBase: '{{ sonarr_config_url_base | default("") }}',
+      InstanceName: '{{ sonarr_config_instance_name | default("Sonarr") }}',
+      EnableSsl: '{{ sonarr_config_enable_ssl | default(false) | bool | string | capitalize }}',
+      SslPort: '{{ sonarr_config_ssl_port | default(9898) }}',
+      SslCertPath: '{{ "{{ sonarr_service_data_dir }}/sonarr.pfx" if sonarr_config_enable_ssl | default(false) else "" }}',  # static placement; var determines controller source.
+      SslCertPassword: '{{ sonarr_config_ssl_cert_password | default("") }}',
+      AuthenticationMethod: '{{ sonarr_config_authentication_method | default("Forms") | capitalize }}',
+      AuthenticationRequired: '{{ "Enabled" if sonarr_config_authentication_required | default(false) else "DisabledForLocalAddresses" }}',
+      ApiKey: '{{ sonarr_config_api_key | default(inventory_hostname | md5 | truncate(32, true, "")) }}',
+      LogLevel: '{{ sonarr_config_log_level | default("info") | lower }}',
+      LogSizeLimit: '{{ sonarr_config_log_size_limit | default(1) }}',
+      AnalyticsEnabled: '{{ sonarr_config_analytics_enabled | default(false) | bool | string | capitalize }}',
+      Branch: '{{ sonarr_config_branch | default("main") | lower }}',
+      UpdateAutomatically: '{{  sonarr_config_update_automatically | default(false) | bool | string | capitalize }}',
+      UpdateMechanism: '{{ "BuiltIn" if sonarr_config_update_mechanism | default(true) else "Script" }}',
+      UpdateScriptPath: '{{ "{{ sonarr_service_data_dir }}/update_script" if not sonarr_config_update_mechanism | default(true) else "" }}',  # static placement; var determines controller source.
+      LaunchBrowser: '{{ sonarr_config_launch_browser | default(false) | bool | string | capitalize }}',
+      # Settings > UI > Style
+      Theme: '{{ sonarr_config_theme | default("auto") }}',
+    }
+
+- name: 'Prep | add config extensions'
+  when: sonarr_config_extensions | length > 0
+  ansible.builtin.set_fact:
+    _sonarr_config: '{{ _sonarr_config | combine(sonarr_config_extensions, recursive=true) }}'

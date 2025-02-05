@@ -1,30 +1,7 @@
 ---
 - name: 'Main | prep'
-  ansible.builtin.include_tasks: prep.yml
-
-- name: 'Main | migrate'
-  ansible.builtin.include_tasks: migrate/v3_to_v4.yml
-  when: >
-    'sonarr' in ansible_facts.packages and
-    not sonarr_force_config_only
-
-- name: 'Main | packages'
-  ansible.builtin.include_tasks: packages.yml
-  when: not sonarr_force_config_only
-
+  ansible.builtin.include_tasks: 'prep.yml'
 - name: 'Main | install'
-  ansible.builtin.include_tasks: install.yml
-  when: not sonarr_force_config_only
-
-# Instead of DB, use REST API with
-#
-# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html
-# https://sonarr.tv/docs/api/#/QualityProfile/get_api_v3_qualityprofile
-#
-# And *ONLY* apply direct DB updates if it is needed and not REST accessible.
-#
-# Test role up to DB configuration first.
-# - name: 'Main | db'
-#   ansible.builtin.include_tasks: db/main.yml
+  ansible.builtin.include_tasks: 'install.yml'
 - name: 'Main | config'
-  ansible.builtin.include_tasks: config.yml
+  ansible.builtin.include_tasks: 'config.yml'
