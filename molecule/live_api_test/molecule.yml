@@ -1,13 +1,18 @@
 ---
 # yamllint disable rule:line-length
-# Confirm:
-# * config.xml set.
-# * sonarr.service active and running.
-# * /var/lib/sonarr created with correct permissions.
-# * /data/media created with correct permissions.
-# * /data/media - file permissions recursively set with correct permissions.
-# * /var/lib/sonarr/update_script does not exist.
-# * /var/lib/sonarr/sonarr.pfx does not exist.
+# Integration test against a live github repository for download and
+# extraction. This confirms the API endpoints are processed correctly and
+# should only be run as one-off test before releasing.
+#
+# Set sonarr_live_api_enable=true to test live API commands.
+#
+#   molecule test -s live_api_test -- -v -e 'sonarr_live_api_enable=true'
+#
+# Additionally, a github token may be provided to test authenticated API use:
+#
+#   molecule test -s live_api_test -- -v -e 'sonarr_live_api_enable=true,github_personal_access_token={TOKEN}'
+#
+# Test success against molecule default tests.
 dependency:
   name: 'galaxy'
 driver:
@@ -25,11 +30,9 @@ provisioner:
       all:
         sonarr_media_root_folders: ['/data/media']
         sonarr_config_api_key: 'abcdef1234567890abcdef1234567890'
-        github_testing_enable: true
-        github_testing_version: 'v4.0.12.2823'
-        github_testing_archive: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
+        sonarr_live_api_enable: false
 platforms:
-  - name: 'sonarr-debian-12-default'
+  - name: 'sonarr-debian-12-live_api_test'
     image: 'ghcr.io/hifis-net/debian-systemd:12'
     systemd: 'always'
     volumes:
@@ -49,7 +52,7 @@ scenario:
     - 'destroy'
     - 'syntax'
     - 'create'
-    # - 'prepare'
+    - 'prepare'
     - 'converge'
     # - 'idempotence'  # Files created, extracted, created, deleted.
     # - 'side_effect'
