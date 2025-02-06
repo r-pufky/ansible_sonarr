@@ -21,7 +21,7 @@ provisioner:
         sonarr_config_update_mechanism: false
         sonarr_config_update_script_path: 'files/update.sh'
         sonarr_media_root_folders: ['/data/media']
-        sonarr_config_api_key: 'b927471037e916e6dac796933c13fdbc'
+        sonarr_config_api_key: 'abcdef1234567890abcdef1234567890'
         github_testing_enable: true
         github_testing_version: 'v4.0.12.2823'
         github_testing_archive: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'

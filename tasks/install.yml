@@ -22,6 +22,9 @@
     github_repo_repo: '{{ sonarr_role_github_repo }}'
     github_repo_release: '{{ sonarr_service_version }}'
     github_repo_archive_type: '{{ sonarr_role_github_repo_archive_type }}'
+    github_binary_enable: true
+    github_binary_specifier: '{{ sonarr_role_github_binary_specifier }}'
+    github_binary_url: '{{ sonarr_role_github_binary_url }}'
     github_file_owner: '{{ sonarr_user }}'
     github_file_group: '{{ sonarr_group }}'
     github_extract_dest: '{{ sonarr_role_github_extract_dest }}'
