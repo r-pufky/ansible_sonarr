@@ -3,7 +3,8 @@
 ###############################################################################
 # Sonarr Prep
 ###############################################################################
-# Prep Sonarr variables for installation and upgrade.
+# Prep Sonarr variables for installation and upgrade. *arr services use the
+# same codebase; any bugs or fixes should be checked for all related services.
 #
 # Generates:
 #   _sonarr_uid: int - sonarr user UID.
@@ -13,7 +14,6 @@
 # * https://sonarr.tv/#home
 # * https://wiki.servarr.com/sonarr
 # * https://github.com/Sonarr/Sonarr/releases
-# * https://wiki.servarr.com/en/sonarr/settings
 # * https://github.com/Sonarr/Sonarr/blob/main/distribution/debian/install.sh
 
 - name: 'Prep | assert SSL requirements'
@@ -50,7 +50,7 @@
   changed_when: false
   register: _sonarr_user_query
 
-- name: 'Prep | save system user UID/GID'
+- name: 'Prep | parse system user UID/GID'
   ansible.builtin.set_fact:
     _sonarr_uid: '{{ _sonarr_user_query.uid }}'
     _sonarr_gid: '{{ _sonarr_user_query.group }}'

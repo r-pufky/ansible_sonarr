@@ -12,7 +12,7 @@
 #
 # Deprecated options may be specified here.
 #
-# https://github.com/r-pufky/ansible_plex/issues
+# https://github.com/r-pufky/ansible_sonarr/issues
 #
 # sonarr_config_extensions:
 #     dict - additional XML settings.

@@ -21,8 +21,8 @@ sonarr_service_delete_old_versions_enable: true
 # Absolute path to database and metadata location. Default: '/var/lib/sonarr'.
 sonarr_service_data_dir: '/var/lib/sonarr'
 
-# Service Umask. Default: '002'
-sonarr_service_u_mask: '002'
+# Service Umask. Default: '0002'.
+sonarr_service_u_mask: '0002'
 
 # Force overwrite existing install?
 #
