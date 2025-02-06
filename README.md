@@ -54,7 +54,9 @@ Create a bug and provide as much information as possible.
 Associate pull requests with a submitted bug.
 
 ## License
-[AGPL-3.0 License](https://github.com/r-pufky/ansible_sonarr/blob/main/LICENSE)
+[AGPL-3.0 License](https://www.tldrlegal.com/license/gnu-affero-general-public-license-v3-agpl-3-0)
+ [(direct link)](https://github.com/r-pufky/ansible_nzbget/blob/main/LICENSE)
 
 ## Author Information
-https://keybase.io/rpufky
+PGP Fingerprint: [466EEC2B67516C7117C85CE3A0BC35D16698BAB9](https://keys.openpgp.org/vks/v1/by-fingerprint/466EEC2B67516C7117C85CE3A0BC35D16698BAB9)
+| [github gist](https://gist.github.com/r-pufky/a8df36977c55b5bb20829267c4c49d22)

@@ -29,6 +29,7 @@
         unit:
           description: 'Sonarr Daemon'
           after:
+            - 'syslog.target'
             - 'network.target'
         service:
           type: 'simple'
