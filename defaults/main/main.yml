@@ -1,7 +1,7 @@
 ---
 # yamllint disable rule:line-length
 ###############################################################################
-# Sonarr Role Configuration
+# Sonarr Service Configuration
 ###############################################################################
 
 # Version.

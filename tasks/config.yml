@@ -118,13 +118,13 @@
 # xmltodict python3 package installed on both controller and node. Just use a
 # template instead.
 - name: 'Config | set Sonarr configuration'
+  notify: 'Handlers | restart sonarr'
   ansible.builtin.template:
     src: 'config.xml.j2'
     dest: '{{ sonarr_service_data_dir }}/config.xml'
     owner: '{{ sonarr_user }}'
     group: '{{ sonarr_group }}'
     mode: '0600'
-  notify: 'Handlers | restart sonarr'
 
 - name: 'Config | start Sonarr'
   ansible.builtin.service:
