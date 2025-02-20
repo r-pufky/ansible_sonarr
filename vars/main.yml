@@ -42,7 +42,13 @@ sonarr_role_github_extract_dest: '/opt/sonarr'
 sonarr_role_github_extract_symlink_target: '/opt/sonarr/sonarr'
 sonarr_role_github_binary_specifier: 'v'
 sonarr_role_github_binary_url: '{VERSION}/Sonarr.main.{BARE_VERSION}.linux-x64.tar.gz'
-
+sonarr_role_github_extract_migrate_files:
+  - 'sonarr.db'
+  - 'sonarr.db-shm'  # Sonarr never closes DB's correctly.
+  - 'sonarr.db-wal'
+  - 'logs.db'
+  - 'logs.db-shm'
+  - 'logs.db-wal'
 ###############################################################################
 # Default Sonarr User/Group
 ###############################################################################
