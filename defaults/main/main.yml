@@ -11,8 +11,8 @@
 # Older versions (<4) are not supported.
 #
 # Values:
-#   {VERSION}: tagged release to use ('v4.0.8.1874').
-#    'latest': use latest stable release.
+#   {VERSION}: Tagged release to use ('v4.0.8.1874').
+#      latest: Use latest stable release.
 #
 # Default: 'latest'.
 sonarr_service_version: 'latest'
