@@ -42,8 +42,12 @@ provisioner:
         sonarr_media_root_folders: ['/data/media']
         sonarr_config_api_key: 'abcdef1234567890abcdef1234567890'
         github_testing_enable: true
-        github_testing_version: 'v4.0.12.2823'
-        github_testing_archive: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
+        github_testing_versions:
+          - 'v4.0.12.2823'
+          - 'v4.0.12.2823'
+        github_testing_archives:
+          - '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
+          - '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
 platforms:
   - name: 'sonarr-debian-12-enable_ssl'
     image: 'ghcr.io/hifis-net/debian-systemd:12'
