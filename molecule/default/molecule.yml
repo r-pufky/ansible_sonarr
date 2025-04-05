@@ -29,7 +29,7 @@ provisioner:
         github_testing_versions:
           - 'v4.0.12.2823'
         github_testing_archives:
-          - '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/files/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
+          - '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
 platforms:
   - name: 'sonarr-debian-12-default'
     image: 'ghcr.io/hifis-net/debian-systemd:12'
@@ -51,7 +51,7 @@ scenario:
     - 'destroy'
     - 'syntax'
     - 'create'
-    # - 'prepare'
+    - 'prepare'
     - 'converge'
     # - 'idempotence'  # Files created, extracted, created, deleted.
     # - 'side_effect'
