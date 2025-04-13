@@ -33,7 +33,7 @@
             - 'network.target'
         service:
           type: 'simple'
-          exec_start: ['{{ sonarr_role_github_extract_symlink_target }}/Sonarr -nobrowser -data={{ sonarr_service_data_dir }}']
+          exec_start: ['{{ sonarr_role_repo_extract_symlink_target }}/Sonarr -nobrowser -data={{ sonarr_service_data_dir }}']
           timeout_stop_sec: 20
           restart: 'always'  # always restart for periodic service restarts
           runtime_max_sec: '{{ "1d" if sonarr_service_restart_daily_enable else "infinity" }}'

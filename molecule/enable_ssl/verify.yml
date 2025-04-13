@@ -10,6 +10,7 @@
     # Sonarr will fail if configuration is bad (r_pufky.srv.systemd)
     - name: 'Enable SSL | verify | assert sonarr.service active'
       ansible.builtin.assert:
+        quiet: true
         that:
           - '"sonarr.service" in ansible_facts.services'
           - 'ansible_facts["services"]["sonarr.service"]["state"] == "running"'
@@ -32,6 +33,7 @@
 
     - name: 'Enable SSL | verify | SSL enabled | assert config.xml'
       ansible.builtin.assert:
+        quiet: true
         that:
           - not _test_sonarr_config_xml.changed
         fail_msg: >
@@ -50,6 +52,7 @@
 
     - name: 'Enable SSL | verify | SSL enabled | assert /var/lib/sonarr/sonarr.pfx'
       ansible.builtin.assert:
+        quiet: true
         that:
           - not _test_sonarr_pfx.changed
         fail_msg: >
@@ -73,6 +76,7 @@
 
     - name: 'Enable SSL | verify | SSL toggled | assert config.xml'
       ansible.builtin.assert:
+        quiet: true
         that:
           - not _test_sonarr_config_xml.changed
         fail_msg: >
@@ -88,6 +92,7 @@
 
     - name: 'Enable SSL | verify | SSL toggled | assert /var/lib/sonarr/sonarr.pfx'
       ansible.builtin.assert:
+        quiet: true
         that:
           - not _test_sonarr_pfx.changed
         fail_msg: '/var/lib/sonarr/sonarr.pfx should not exist.'
