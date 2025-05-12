@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Sonarr Prep
 ###############################################################################
@@ -72,27 +71,66 @@
       Port: '{{ sonarr_config_port | default(8989) }}',
       UrlBase: '{{ sonarr_config_url_base | default("") }}',
       InstanceName: '{{ sonarr_config_instance_name | default("Sonarr") }}',
-      EnableSsl: '{{ sonarr_config_enable_ssl | default(false) | bool | string | capitalize }}',
+      EnableSsl: '{{
+          sonarr_config_enable_ssl | default(false) |
+          bool | string | capitalize
+        }}',
       SslPort: '{{ sonarr_config_ssl_port | default(9898) }}',
-      SslCertPath: '{{ "{{ sonarr_service_data_dir }}/sonarr.pfx" if sonarr_config_enable_ssl | default(false) else "" }}',  # static placement; var determines controller source.
+      SslCertPath: '{{
+          "{{ sonarr_service_data_dir }}/sonarr.pfx"
+          if sonarr_config_enable_ssl | default(false) else
+          ""
+        }}',
       SslCertPassword: '{{ sonarr_config_ssl_cert_password | default("") }}',
-      AuthenticationMethod: '{{ sonarr_config_authentication_method | default("Forms") | capitalize }}',
-      AuthenticationRequired: '{{ "Enabled" if sonarr_config_authentication_required | default(false) else "DisabledForLocalAddresses" }}',
-      ApiKey: '{{ sonarr_config_api_key | default(inventory_hostname | md5 | truncate(32, true, "")) }}',
+      AuthenticationMethod: '{{
+          sonarr_config_authentication_method | default("Forms") | capitalize
+        }}',
+      AuthenticationRequired: '{{
+          "Enabled"
+          if sonarr_config_authentication_required | default(false) else
+          "DisabledForLocalAddresses"
+        }}',
+      ApiKey: '{{
+          sonarr_config_api_key |
+          default(inventory_hostname | md5 | truncate(32, true, ""))
+        }}',
       LogLevel: '{{ sonarr_config_log_level | default("info") | lower }}',
       LogSizeLimit: '{{ sonarr_config_log_size_limit | default(1) }}',
-      AnalyticsEnabled: '{{ sonarr_config_analytics_enabled | default(false) | bool | string | capitalize }}',
+      AnalyticsEnabled: '{{
+          sonarr_config_analytics_enabled | default(false) |
+          bool | string | capitalize
+        }}',
       Branch: '{{ sonarr_config_branch | default("main") | lower }}',
-      UpdateAutomatically: '{{  sonarr_config_update_automatically | default(false) | bool | string | capitalize }}',
-      UpdateMechanism: '{{ "BuiltIn" if sonarr_config_update_mechanism | default(true) else "Script" }}',
-      UpdateScriptPath: '{{ "{{ sonarr_service_data_dir }}/update_script" if not sonarr_config_update_mechanism | default(true) else "" }}',  # static placement; var determines controller source.
-      LaunchBrowser: '{{ sonarr_config_launch_browser | default(false) | bool | string | capitalize }}',
+      UpdateAutomatically: '{{
+          sonarr_config_update_automatically | default(false) |
+          bool | string | capitalize
+        }}',
+      UpdateMechanism: '{{
+          "BuiltIn"
+          if sonarr_config_update_mechanism | default(true) else
+          "Script"
+        }}',
+      UpdateScriptPath: '{{
+          "{{ sonarr_service_data_dir }}/update_script"
+          if not sonarr_config_update_mechanism | default(true) else
+          ""
+        }}',
+      LaunchBrowser: '{{
+          sonarr_config_launch_browser | default(false) |
+          bool | string | capitalize
+        }}',
       # Settings > UI > Style
       Theme: '{{ sonarr_config_theme | default("auto") | lower }}',
     }
-    _sonarr_migrate_metadata: '{{ sonarr_role_repo_extract_migrate_files if not sonarr_service_migrate_metadata else sonarr_role_repo_extract_migrate_files + ["MediaCover"] }}'
+    _sonarr_migrate_metadata: '{{
+        sonarr_role_repo_extract_migrate_files
+        if not sonarr_service_migrate_metadata else
+        sonarr_role_repo_extract_migrate_files + ["MediaCover"]
+      }}'
 
 - name: 'Prep | add config extensions'
   when: sonarr_config_extensions | length > 0
   ansible.builtin.set_fact:
-    _sonarr_config: '{{ _sonarr_config | combine(sonarr_config_extensions, recursive=true) }}'
+    _sonarr_config: '{{
+        _sonarr_config | combine(sonarr_config_extensions, recursive=true)
+      }}'

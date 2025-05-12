@@ -101,7 +101,8 @@ sonarr_config_authentication_required: false
 #   '': random 32 character alphanumeric hash
 #
 # Default: '{RANDOM}' (insecure idempotent API key based on hostname).
-sonarr_config_api_key: '{{ inventory_hostname | md5 | truncate(32, true, "") }}'
+sonarr_config_api_key:
+  '{{ inventory_hostname | md5 | truncate(32, true, "") }}'
 
 ###############################################################################
 # Settings > General > Logging

@@ -1,13 +1,18 @@
 ---
 # yamllint disable rule:line-length
+###############################################################################
+# Enable SSL
+###############################################################################
+# SSL is enabled and toggled correctly.
 #
-# Confirm:
+# Tests:
 # * /var/lib/sonarr/sonarr.pfx exists.
 # * toggling ssl on, then off removes sonarr.pfx.
 #   <EnableSsl>False</EnableSsl>  # true requires ssl_cert
 #   <SslCertPath>/var/lib/sonarr/snakeoil.pfx</SslCertPath>
 #   <SslCertPassword>testing</SslCertPassword>  # stored plaintext.
-# sonarr_config_enable_ssl -- test when false w and w/o cert
+# * sonarr_config_enable_ssl -- test when false w and w/o cert.
+
 dependency:
   name: 'galaxy'
 driver:

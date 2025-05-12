@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Sonarr Role Options
 ###############################################################################
@@ -38,7 +37,7 @@ sonarr_role_packages:
 sonarr_role_repo_release_owner: 'Sonarr'
 sonarr_role_repo_release_repo: 'Sonarr'
 sonarr_role_repo_extract_dir: '/opt/sonarr'
-sonarr_role_repo_extract_symlink_target: '/opt/sonarr/sonarr'
+sonarr_role_repo_extract_symlink: '/opt/sonarr/sonarr'
 sonarr_role_repo_release_specifier: 'v'
 sonarr_role_repo_release_asset: 'Sonarr.main.{BARE_VERSION}.linux-x64.tar.gz'
 sonarr_role_repo_extract_migrate_files:
@@ -48,6 +47,7 @@ sonarr_role_repo_extract_migrate_files:
   - 'logs.db'
   - 'logs.db-shm'
   - 'logs.db-wal'
+
 ###############################################################################
 # Default Sonarr User/Group
 ###############################################################################
