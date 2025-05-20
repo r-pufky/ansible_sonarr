@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Enable SSL
 ###############################################################################
@@ -29,7 +28,10 @@ provisioner:
     group_vars:
       all:
         sonarr_config_enable_ssl: true
-        sonarr_config_ssl_cert_path: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/test.pfx'
+        sonarr_config_ssl_cert_path: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/cache/test.pfx"
+          }}'
         sonarr_config_ssl_cert_password: 'test'
         sonarr_media_root_folders: ['/data/media']
         sonarr_config_api_key: 'abcdef1234567890abcdef1234567890'
@@ -37,10 +39,16 @@ provisioner:
         repo_testing_versions:
           - comment: 'default'
             version: 'v4.0.12.2823'
-            asset: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
+            asset: '{{
+                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+                "/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz"
+              }}'
           - comment: 'toggle'
             version: 'v4.0.12.2823'
-            asset: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
+            asset: '{{
+                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+                "/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz"
+              }}'
 platforms:
   - name: 'sonarr-debian-12-enable_ssl'
     image: 'ghcr.io/hifis-net/debian-systemd:12'

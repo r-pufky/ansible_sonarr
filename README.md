@@ -4,8 +4,6 @@ Sonarr installation from public release tarball.
 ## Requirements
 [supported platforms](https://github.com/r-pufky/ansible_sonarr/blob/main/meta/main.yml)
 
-[collections/roles](https://github.com/r-pufky/ansible_sonarr/blob/main/meta/requirements.yml)
-
 ## Role Variables
 [defaults](https://github.com/r-pufky/ansible_sonarr/tree/main/defaults/main)
 
@@ -15,8 +13,8 @@ All ports and protocols have been defined for the role.
 [defaults/ports.yml](https://github.com/r-pufky/ansible_sonarr/blob/main/defaults/main/ports.yml)
 
 ## Dependencies
-Part of the [r_pufky.srv](https://github.com/r-pufky/ansible_collection_srv)
-collection.
+**galaxy-ng** roles cannot be used independently. Part of
+[r_pufky.srv](https://github.com/r-pufky/ansible_collection_srv) collection.
 
 ## Example Playbook
 Read defaults documentation.

@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Default
 ###############################################################################
@@ -35,7 +34,11 @@ provisioner:
         repo_testing_versions:
           - comment: 'default'
             version: 'v4.0.12.2823'
-            asset: '{{ lookup("env", "MOLECULE_PROJECT_DIRECTORY") }}/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
+            asset: '{{
+                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+                "/molecule/cache/" ~
+                "Sonarr.main.4.0.12.2823.linux-x64.tar.gz"
+              }}'
 platforms:
   - name: 'sonarr-debian-12-default'
     image: 'ghcr.io/hifis-net/debian-systemd:12'

@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 - name: 'Enable SSL | verify'
   hosts: 'all'
   gather_facts: false
@@ -7,7 +6,7 @@
     - name: 'Enable SSL | verify | gather service status'
       ansible.builtin.service_facts:
 
-    # Sonarr will fail if configuration is bad (r_pufky.srv.systemd)
+    # Sonarr will fail if configuration is bad (r_pufky.deb.systemd)
     - name: 'Enable SSL | verify | assert sonarr.service active'
       ansible.builtin.assert:
         quiet: true
@@ -22,7 +21,7 @@
   tasks:
     - name: 'Enable SSL | verify | SSL enabled | config.xml'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
         test_name: 'Enable SSL | verify | SSL enabled | config.xml'
@@ -34,7 +33,7 @@
 
     - name: 'Enable SSL | verify | SSL enabled | /var/lib/sonarr/sonarr.pfx'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
         test_name: >-
@@ -52,7 +51,7 @@
   tasks:
     - name: 'Enable SSL | verify | SSL toggled | config.xml'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'copy.yml'
       vars:
         test_name: 'Enable SSL | verify | SSL toggled | config.xml'
@@ -64,7 +63,7 @@
 
     - name: 'Enable SSL | verify | SSL toggled | /var/lib/sonarr/sonarr.pfx'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.tests'
+        name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
         test_name: >-
