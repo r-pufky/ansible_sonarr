@@ -1,26 +1,26 @@
 ---
-- name: 'Update mechanisms | prepare'
+- name: 'Prepare'
   hosts: 127.0.0.1
   connection: local
   gather_facts: false
   tasks:
-    - name: 'Update mechanisms | prepare | create cache'
+    - name: 'Prepare | create cache'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'create_cache.yml'
       vars:
-        test_name: 'Update mechanisms | prepare | create cache'
+        test_name: 'Prepare | create cache'
 
-    - name: 'Update mechanisms | prepare | check 4.0.12.2823'
+    - name: 'Prepare | check 4.0.15.2941'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: 'Update mechanisms | prepare | cache 4.0.12.2823'
-        test_dest: 'Sonarr.main.4.0.12.2823.linux-x64.tar.gz'
+        test_name: 'Prepare | cache 4.0.15.2941'
+        test_dest: 'Sonarr.main.4.0.15.2941.linux-x64.tar.gz'
         test_url: '{{
             "https://github.com/Sonarr/Sonarr/releases/download/" ~
-            "v4.0.12.2823/" ~
-            "Sonarr.main.4.0.12.2823.linux-x64.tar.gz"
+            "v4.0.15.2941/" ~
+            "Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
           }}'
         test_mode: '0640'

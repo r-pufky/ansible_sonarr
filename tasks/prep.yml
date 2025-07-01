@@ -2,135 +2,64 @@
 ###############################################################################
 # Sonarr Prep
 ###############################################################################
-# Prep Sonarr variables for installation and upgrade. *arr services use the
-# same codebase; any bugs or fixes should be checked for all related services.
-#
-# Generates:
-#   _sonarr_uid: int - sonarr user UID.
-#   _sonarr_gid: int - sonarr user GID.
-#   _sonarr_migrate_metadata: list of str - files and directories to migrate.
-#
-# Reference:
-# * https://sonarr.tv/#home
-# * https://wiki.servarr.com/sonarr
-# * https://github.com/Sonarr/Sonarr/releases
-# * https://github.com/Sonarr/Sonarr/blob/main/distribution/debian/install.sh
+# *arr services use the same codebase; any bugs or fixes should be checked for
+# all related services.
 
 - name: 'Prep | assert SSL requirements'
-  when: sonarr_config_enable_ssl
+  when: _sonarr_cfg_enable_ssl.raw
   ansible.builtin.assert:
     quiet: true
     that:
-      - sonarr_config_ssl_cert_path | length > 0
+      - _sonarr_cfg_ssl_cert_path.parsed | length > 0
     fail_msg: >
-      sonarr_config_enable_ssl=true requires
-      sonarr_config_ssl_cert_path set.
+      ✘ sonarr_cfg_enable_ssl=true requires
+      sonarr_cfg_ssl_cert_path set.
+
+      sonarr_cfg_ssl_cert_path: '{{ _sonarr_cfg_ssl_cert_path.raw }}'
 
 - name: 'Prep | assert update script requirements'
-  when: not sonarr_config_update_mechanism
+  when: not _sonarr_cfg_update_mechanism.raw
   ansible.builtin.assert:
     quiet: true
     that:
-      - sonarr_config_update_script_path | length > 0
+      - _sonarr_cfg_update_script_path.parsed | length > 0
     fail_msg: >
-      sonarr_config_update_script_path must be set when
-      sonarr_config_update_mechanism=False.
+      ✘ sonarr_cfg_update_mechanism=false requires
+      sonarr_cfg_update_script_path set.
+
+      sonarr_cfg_update_script_path: '{{ _sonarr_cfg_update_script_path.raw }}'
 
 - name: 'Prep | manage users'
-  when: sonarr_create_user
+  when: _sonarr_srv_create_user.raw
   ansible.builtin.include_role:
     name: 'r_pufky.deb.users'
     tasks_from: 'role_account_add.yml'
   vars:
-    users_role_group: '{{ sonarr_role_group }}'
     users_role_user: '{{ sonarr_role_user }}'
+    users_role_group: '{{ sonarr_role_group }}'
 
-- name: 'Prep | enumerate system user {{ sonarr_user }}'
+- name: 'Prep | enumerate system user {{ _sonarr_srv_user.raw }}'
   ansible.builtin.user:
-    name: '{{ sonarr_user }}'
+    name: '{{ _sonarr_srv_user.raw }}'
   check_mode: true
   changed_when: false
-  register: _sonarr_user_query
+  register: _sonarr_srv_user_query
 
 - name: 'Prep | parse system user UID/GID'
   ansible.builtin.set_fact:
-    _sonarr_uid: '{{ _sonarr_user_query.uid }}'
-    _sonarr_gid: '{{ _sonarr_user_query.group }}'
-
-# Sonarr does not consistently apply casing to XML settings and are frequently
-# mis-spelled, inconsistently spelled, ordered, or strings used for boolean
-# values; so we have to explicitly map those settings to the equivalent role
-# settings. Order does not matter but will change based on WebUI usage and what
-# values were changed last. This can lead to 'changed' configurations when no
-# values were actually changed.
-- name: 'Prep | build base config'
-  ansible.builtin.set_fact:
-    _sonarr_config: {
-      # General
-      BindAddress: '{{ sonarr_config_bind_address | default("*") }}',
-      Port: '{{ sonarr_config_port | default(8989) }}',
-      UrlBase: '{{ sonarr_config_url_base | default("") }}',
-      InstanceName: '{{ sonarr_config_instance_name | default("Sonarr") }}',
-      EnableSsl: '{{
-          sonarr_config_enable_ssl | default(false) |
-          bool | string | capitalize
-        }}',
-      SslPort: '{{ sonarr_config_ssl_port | default(9898) }}',
-      SslCertPath: '{{
-          "{{ sonarr_service_data_dir }}/sonarr.pfx"
-          if sonarr_config_enable_ssl | default(false) else
-          ""
-        }}',
-      SslCertPassword: '{{ sonarr_config_ssl_cert_password | default("") }}',
-      AuthenticationMethod: '{{
-          sonarr_config_authentication_method | default("Forms") | capitalize
-        }}',
-      AuthenticationRequired: '{{
-          "Enabled"
-          if sonarr_config_authentication_required | default(false) else
-          "DisabledForLocalAddresses"
-        }}',
-      ApiKey: '{{
-          sonarr_config_api_key |
-          default(inventory_hostname | md5 | truncate(32, true, ""))
-        }}',
-      LogLevel: '{{ sonarr_config_log_level | default("info") | lower }}',
-      LogSizeLimit: '{{ sonarr_config_log_size_limit | default(1) }}',
-      AnalyticsEnabled: '{{
-          sonarr_config_analytics_enabled | default(false) |
-          bool | string | capitalize
-        }}',
-      Branch: '{{ sonarr_config_branch | default("main") | lower }}',
-      UpdateAutomatically: '{{
-          sonarr_config_update_automatically | default(false) |
-          bool | string | capitalize
-        }}',
-      UpdateMechanism: '{{
-          "BuiltIn"
-          if sonarr_config_update_mechanism | default(true) else
-          "Script"
-        }}',
-      UpdateScriptPath: '{{
-          "{{ sonarr_service_data_dir }}/update_script"
-          if not sonarr_config_update_mechanism | default(true) else
-          ""
-        }}',
-      LaunchBrowser: '{{
-          sonarr_config_launch_browser | default(false) |
-          bool | string | capitalize
-        }}',
-      # Settings > UI > Style
-      Theme: '{{ sonarr_config_theme | default("auto") | lower }}',
-    }
-    _sonarr_migrate_metadata: '{{
-        sonarr_role_repo_extract_migrate_files
-        if not sonarr_service_migrate_metadata else
-        sonarr_role_repo_extract_migrate_files + ["MediaCover"]
+    _sonarr_srv_user: '{{
+        _sonarr_srv_user |
+        combine({"parsed": _sonarr_srv_user_query.uid})
+      }}'
+    _sonarr_srv_group: '{{
+        _sonarr_srv_group |
+        combine({"parsed": _sonarr_srv_user_query.group})
       }}'
 
-- name: 'Prep | add config extensions'
-  when: sonarr_config_extensions | length > 0
-  ansible.builtin.set_fact:
-    _sonarr_config: '{{
-        _sonarr_config | combine(sonarr_config_extensions, recursive=true)
-      }}'
+- name: 'Prep | stop services'
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    state: 'stopped'
+  failed_when: false
+  loop:
+    - 'sonarr.service'

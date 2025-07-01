@@ -7,14 +7,27 @@
 # version is released. Additional configuration settings may need to be added
 # to defaults for point releases.
 #
+# Updates:
+# * New MAJOR, MINOR releases should hard branch at version before starting
+#   (e.g. 2.14.x branch).
+# * Keep a separate change log as changes are made, you will not remember all
+#   of them.
+# * Use bare-metal docs to validate package/process changes.
+# * Update role defaults (includes updating defaults, tasks):
+#   * Use configuration docs to add new variables.
+#   * Use defaults/ to remove any changed/deprecated variables.
+# * Update tests for any changes.
+# * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
+# * Tag with MAJOR.MINOR version, with PATCH representing role change.
+#
 # Reference:
 # * https://github.com/Sonarr/Sonarr/blob/main/distribution/debian/install.sh
 # * https://github.com/Sonarr/Sonarr/releases
 
 # Last time Sonarr options were validated against a default configuration.
-sonarr_role_validate_date: '2024-08-18'
+sonarr_role_validate_date: '2025-07-01'
 sonarr_role_validate_release: 'bookworm'
-sonarr_role_validate_version: 'v4.0.12.2823'
+sonarr_role_validate_version: 'v4.0.15.2941'
 sonarr_role_validate_script_release: '1.0.3'
 sonarr_role_validate_script_date: '2024-01-06'
 

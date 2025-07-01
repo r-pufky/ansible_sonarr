@@ -36,8 +36,8 @@ provisioner:
   inventory:
     group_vars:
       all:
-        sonarr_media_root_folders: ['/data/media']
-        sonarr_config_api_key: 'abcdef1234567890abcdef1234567890'
+        sonarr_srv_media_root_folders: ['/data/media']
+        sonarr_cfg_api_key: 'abcdef1234567890abcdef1234567890'
         sonarr_live_api_enable: false
 platforms:
   - name: 'sonarr-debian-12-live_api_test'

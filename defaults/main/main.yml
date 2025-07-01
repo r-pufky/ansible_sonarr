@@ -1,31 +1,41 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Sonarr Service Configuration
 ###############################################################################
 # Existing databases are migrated automatically when new versions are
-# installed.
-
-# Version.
+# installed. Migration between database platforms is not supported and must be
+# done manually.
 #
-# Older versions (<4) are not supported. Set repo_host_access_token if github
-# API is rate limited. See r_pufky.deb.repo.
+# Set repo_host_access_token if API is rate limited. See r_pufky.deb.repo.
+
+# Sonarr Release.
+#
+# Versions (Schematic):
+#       MAJOR: Unsafe - requires major role changes; only default MAJOR version
+#              is supported. See other branches if they exist.
+#       MINOR: Safe - Usually requires no role updates. Changes usually
+#              constrained to internal changes requiring no config file or
+#              dependency changes.
+#       PATCH: Safe - Usually requires no role updates.
+#   RECOMMEND: Only increment PATCH. Never use 'latest'.
 #
 # Values:
-#   {VERSION}: Tagged release to use ('v4.0.8.1874').
+#   {VERSION}: Tagged release to use ('v4.0.15.2941').
 #      latest: Use latest stable release.
 #
-# Default: 'latest'.
-sonarr_service_version: 'latest'
+# Default: 'v4.0.15.2941'.
+sonarr_srv_version: 'v4.0.15.2941'
 
 # Remove old installs on upgrade success? Default: True.
-sonarr_service_delete_old_versions_enable: true
+sonarr_srv_delete_old_versions_enable: true
 
-# Absolute path to database and metadata location. Default: '/var/lib/sonarr'.
-sonarr_service_data_dir: '/var/lib/sonarr'
+# Absolute path to database and metadata location.
+#
+# Default: '/data/sonarr/config'.
+sonarr_srv_config_dir: '/data/sonarr/config'
 
 # Service Umask. Default: '0002'.
-sonarr_service_u_mask: '0002'
+sonarr_srv_u_mask: '0002'
 
 # Force overwrite existing install?
 #
@@ -35,7 +45,7 @@ sonarr_service_u_mask: '0002'
 # directories (if any). Any user data in these directories are DESTROYED.
 #
 # Default: False.
-sonarr_service_force_overwrite: false
+sonarr_srv_force_overwrite: false
 
 # Migrate metadata (MediaCover) directory?
 #
@@ -43,7 +53,7 @@ sonarr_service_force_overwrite: false
 # version if not migrated with databases.
 #
 # Default: True.
-sonarr_service_migrate_metadata: true
+sonarr_srv_migrate_metadata: true
 
 # Recursively set metadata permissions?
 #
@@ -51,7 +61,7 @@ sonarr_service_migrate_metadata: true
 # slow.
 #
 # Default: False.
-sonarr_service_permissions_recursive_enable: false
+sonarr_srv_permissions_recursive_enable: false
 
 # Automatically restart Sonarr daily?
 #
@@ -59,7 +69,7 @@ sonarr_service_permissions_recursive_enable: false
 # updates.
 #
 # Default: True.
-sonarr_service_restart_daily_enable: true
+sonarr_srv_restart_daily_enable: true
 
 # Only apply configuration?
 #
@@ -71,10 +81,12 @@ sonarr_service_restart_daily_enable: true
 # Useful when adding a change without reconfiguring the whole system or
 # checking and installing a new version. Suggest applying with extra options:
 #
-#   ansible-playbook site.yml --tags Sonarr -e 'sonarr_service_force_config_only_enable=true'
+#   ansible-playbook site.yml
+#       --tags Sonarr
+#       -e 'sonarr_srv_force_config_only_enable=true'
 #
 # Default: False.
-sonarr_service_force_config_only_enable: false
+sonarr_srv_force_config_only_enable: false
 
 ###############################################################################
 # Sonarr User
@@ -85,16 +97,16 @@ sonarr_service_force_config_only_enable: false
 # Enable sonarr_create_user if this account is not externally managed.
 #
 # Default: 'media'.
-sonarr_user: 'media'
+sonarr_srv_user: 'media'
 
 # Group that Sonarr will run under.
 #
 # Enable sonarr_create_user if this group is not externally managed.
 #
 # Default: 'media'.
-sonarr_group: 'media'
+sonarr_srv_group: 'media'
 
-# Create sonarr_user, sonarr_group if not detected?
+# Create sonarr_srv_user, sonarr_srv_group if not detected?
 #
 # Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
 #
@@ -107,17 +119,31 @@ sonarr_create_user: true
 
 # Root media storage folders.
 #
-# Folders will be created/set with sonarr_user, sonarr_group,
+# Folders will be created/set with sonarr_srv_user, sonarr_srv_group,
 # sonarr_media_perms_folder.
 #
 # Default: [].
 sonarr_media_root_folders: []
 
+# Enable user management of data/media files?
+#
+# Use sonarr_srv_user to execute data/media management commands. Role
+# applies media permissions using 'root' by default. For mounted data locations
+# (NFS with squashed mounts, mapped container mounts, etc) the local root user
+# will not have sufficient privileges to modify these files.
+#
+# Applies to:
+# * sonarr_srv_config_dir
+# * sonarr_srv_media_root_folders
+#
+# Default: False.
+sonarr_srv_user_data_manage_enable: false
+
 # Media folder permissions octal.
 #
 # Media folders specified by sonarr_media_root_folders will always be
-# recursively set using sonarr_media_perms_folder, sonarr_user, and
-# sonarr_group.
+# recursively set using sonarr_media_perms_folder, sonarr_srv_user, and
+# sonarr_srv_group.
 #
 # Default: '0755'.
 sonarr_media_perms_folder: '0755'
@@ -125,13 +151,15 @@ sonarr_media_perms_folder: '0755'
 # Enable setting of media file permissions?
 #
 # Set file permissions within sonarr_media_root_folders using
-# sonarr_media_perms_file, sonarr_user, and sonarr_group. Large sets of files
-# may be slow to set permissions.
+# sonarr_media_perms_file, sonarr_srv_user, and sonarr_srv_group. Large sets of
+# files may be slow to set permissions.
 #
 # Useful when first configuring to ensure service has access to all specified
 # media locations. Suggest applying with extra options:
 #
-#   ansible-playbook site.yml --tags Sonarr -e 'sonarr_media_set_perms_file_enable=true'
+#   ansible-playbook site.yml
+#       --tags Sonarr
+#       -e 'sonarr_media_set_perms_file_enable=true'
 #
 # Default: False.
 sonarr_media_set_perms_file_enable: false

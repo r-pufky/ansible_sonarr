@@ -3,9 +3,6 @@
 # Sonarr Install
 ###############################################################################
 # Install specified version from github release.
-#
-# Args:
-#   _sonarr_migrate_metadata: list of str - files and directories to migrate.
 
 - name: 'Install | packages'
   ansible.builtin.include_role:
@@ -15,23 +12,23 @@
       - '{{ sonarr_role_packages }}'
     apt_package_update_cache: true
 
-- name: 'Install | Sonarr package {{ sonarr_service_version }}'
-  when: not sonarr_service_force_config_only_enable
+- name: 'Install | Sonarr package {{ _sonarr_srv_version.raw }}'
+  when: not _sonarr_srv_force_config_only_enable.raw
   ansible.builtin.include_role:
     name: 'r_pufky.deb.repo'
   vars:
     repo_release_owner: '{{ sonarr_role_repo_release_owner }}'
     repo_release_repo: '{{ sonarr_role_repo_release_repo }}'
-    repo_release_tag: '{{ sonarr_service_version }}'
+    repo_release_tag: '{{ _sonarr_srv_version.raw }}'
     repo_release_specifier: '{{ sonarr_role_repo_release_specifier }}'
     repo_release_asset: '{{ sonarr_role_repo_release_asset }}'
-    repo_file_owner: '{{ sonarr_user }}'
-    repo_file_group: '{{ sonarr_group }}'
+    repo_file_owner: '{{ _sonarr_srv_user.parsed }}'
+    repo_file_group: '{{ _sonarr_srv_group.parsed }}'
     repo_extract_dir: '{{ sonarr_role_repo_extract_dir }}'
     repo_extract_symlink: '{{ sonarr_role_repo_extract_symlink }}'
-    repo_extract_migrate_files: '{{ _sonarr_migrate_metadata }}'
+    repo_extract_migrate_files: '{{ _sonarr_srv_migrate_metadata.role }}'
     repo_extract_delete_old_versions:
-      '{{ sonarr_service_delete_old_versions_enable }}'
-    repo_force_overwrite: '{{ sonarr_service_force_overwrite }}'
+      '{{ _sonarr_srv_delete_old_versions_enable.raw }}'
+    repo_force_overwrite: '{{ _sonarr_srv_force_overwrite.raw }}'
     repo_extract_mode: 'a-st,o-rwx'
     repo_extract_extra_opts: '--strip-components=1'

@@ -29,10 +29,10 @@ permissions will be set to ensure Sonarr can read files.
   roles:
      - 'r_pufky.sonarr'
   vars:
-    sonarr_service_version: 'latest'
-    sonarr_config_api_key: '{{ vault_sonarr_api_key }}'
-    sonarr_config_update_automatically: true
-    sonarr_config_theme: 'dark'
+    sonarr_srv_version: 'latest'
+    sonarr_cfg_api_key: '{{ vault_sonarr_api_key }}'
+    sonarr_cfg_update_automatically: true
+    sonarr_cfg_theme: 'dark'
     sonarr_media_root_folders:
       - '/data/media'
     sonarr_media_set_perms_file_enable: true
@@ -44,7 +44,7 @@ toggled on after the user exists in the database. Suggest running initial role
 application temporarily disabling this option:
 
 ``` bash
-ansible-playbook sonarr.yml -e 'sonarr_config_authentication_method=external'
+ansible-playbook sonarr.yml -e 'sonarr_cfg_authentication_method=external'
 ```
 
 ## Development

@@ -1,18 +1,18 @@
 ---
-- name: 'Enable SSL | converge'
+- name: 'Converge'
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Enable SSL | converge | apply r_pufky.srv.sonarr'
+    - name: 'Converge | apply r_pufky.srv.sonarr'
       ansible.builtin.include_role:
         name: 'r_pufky.srv.sonarr'
 
-- name: 'Enable SSL | converge | toggle SSL'
+- name: 'Converge | toggle SSL'
   hosts: 'sonarr-debian-12-enable_ssl-toggle'
   gather_facts: false
   tasks:
-    - name: 'Enable SSL | converge | toggle SSL | apply r_pufky.srv.sonarr'
+    - name: 'Converge | toggle SSL | apply r_pufky.srv.sonarr'
       ansible.builtin.include_role:
         name: 'r_pufky.srv.sonarr'
       vars:
-        sonarr_config_enable_ssl: false
+        sonarr_cfg_enable_ssl: false

@@ -5,12 +5,12 @@
 # SSL is enabled and toggled correctly.
 #
 # Tests:
-# * /var/lib/sonarr/sonarr.pfx exists.
+# * /data/sonarr/config/sonarr.pfx exists.
 # * toggling ssl on, then off removes sonarr.pfx.
 #   <EnableSsl>False</EnableSsl>  # true requires ssl_cert
-#   <SslCertPath>/var/lib/sonarr/snakeoil.pfx</SslCertPath>
+#   <SslCertPath>/data/sonarr/config/snakeoil.pfx</SslCertPath>
 #   <SslCertPassword>testing</SslCertPassword>  # stored plaintext.
-# * sonarr_config_enable_ssl -- test when false w and w/o cert.
+# * sonarr_cfg_enable_ssl -- test when false w and w/o cert.
 
 dependency:
   name: 'galaxy'
@@ -27,27 +27,27 @@ provisioner:
   inventory:
     group_vars:
       all:
-        sonarr_config_enable_ssl: true
-        sonarr_config_ssl_cert_path: '{{
+        sonarr_cfg_enable_ssl: true
+        sonarr_cfg_ssl_cert_path: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/cache/test.pfx"
           }}'
-        sonarr_config_ssl_cert_password: 'test'
-        sonarr_media_root_folders: ['/data/media']
-        sonarr_config_api_key: 'abcdef1234567890abcdef1234567890'
+        sonarr_cfg_ssl_cert_password: 'test'
+        sonarr_srv_media_root_folders: ['/data/media']
+        sonarr_cfg_api_key: 'abcdef1234567890abcdef1234567890'
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'default'
-            version: 'v4.0.12.2823'
+            version: 'v4.0.15.2941'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz"
+                "/molecule/cache/Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
               }}'
           - comment: 'toggle'
-            version: 'v4.0.12.2823'
+            version: 'v4.0.15.2941'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz"
+                "/molecule/cache/Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
               }}'
 platforms:
   - name: 'sonarr-debian-12-enable_ssl'

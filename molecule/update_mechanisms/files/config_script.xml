@@ -16,7 +16,7 @@
   <Branch>main</Branch>
   <UpdateAutomatically>False</UpdateAutomatically>
   <UpdateMechanism>Script</UpdateMechanism>
-  <UpdateScriptPath>/var/lib/sonarr/update_script</UpdateScriptPath>
+  <UpdateScriptPath>/data/sonarr/config/update_script</UpdateScriptPath>
   <LaunchBrowser>False</LaunchBrowser>
   <Theme>auto</Theme>
 </Config>

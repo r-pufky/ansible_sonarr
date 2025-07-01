@@ -2,16 +2,17 @@
 ###############################################################################
 # Default
 ###############################################################################
-# Default configuration is deployed successfully.
+# Default configuration is deployed successfully. Configuration should succeed
+# with and without sonarr_srv_user_data_manage_enable.
 #
 # Tests:
 # * config.xml set.
 # * sonarr.service active and running.
-# * /var/lib/sonarr created with correct permissions.
+# * /data/sonarr/config created with correct permissions.
 # * /data/media created with correct permissions.
 # * /data/media - file permissions recursively set with correct permissions.
-# * /var/lib/sonarr/update_script does not exist.
-# * /var/lib/sonarr/sonarr.pfx does not exist.
+# * /data/sonarr/config/update_script does not exist.
+# * /data/sonarr/config/sonarr.pfx does not exist.
 
 dependency:
   name: 'galaxy'
@@ -28,16 +29,16 @@ provisioner:
   inventory:
     group_vars:
       all:
-        sonarr_media_root_folders: ['/data/media']
-        sonarr_config_api_key: 'abcdef1234567890abcdef1234567890'
+        sonarr_srv_media_root_folders: ['/data/media']
+        sonarr_cfg_api_key: 'abcdef1234567890abcdef1234567890'
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'default'
-            version: 'v4.0.12.2823'
+            version: 'v4.0.15.2941'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
                 "/molecule/cache/" ~
-                "Sonarr.main.4.0.12.2823.linux-x64.tar.gz"
+                "Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
               }}'
 platforms:
   - name: 'sonarr-debian-12-default'
@@ -49,6 +50,13 @@ platforms:
     pre_build_image: true
     published_ports:
       - '8989/tcp'
+  - name: 'sonarr-debian-12-user_data'
+    image: 'ghcr.io/hifis-net/debian-systemd:12'
+    systemd: 'always'
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
 verifier:
   name: 'ansible'
 lint: |

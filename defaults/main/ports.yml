@@ -7,7 +7,7 @@
 # Reference:
 # * https://github.com/r-pufky/ansible_ufw
 
-sonarr_ports:
+sonarr_srv_ports:
   - proto: 'tcp'
     from_ip: 'any'
     to_port: 8989

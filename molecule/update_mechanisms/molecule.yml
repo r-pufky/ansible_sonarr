@@ -5,7 +5,7 @@
 # Verify update scripts are deployed and executed correctly.
 #
 # Tests:
-# * /var/lib/sonarr/update_script exists.
+# * /data/sonarr/config/update_script exists.
 # * toggling script update on, then off removes update_script.
 
 dependency:
@@ -23,23 +23,23 @@ provisioner:
   inventory:
     group_vars:
       all:
-        sonarr_config_update_mechanism: false
-        sonarr_config_update_script_path: 'files/update.sh'
-        sonarr_media_root_folders: ['/data/media']
-        sonarr_config_api_key: 'abcdef1234567890abcdef1234567890'
+        sonarr_cfg_update_mechanism: false
+        sonarr_cfg_update_script_path: 'files/update.sh'
+        sonarr_srv_media_root_folders: ['/data/media']
+        sonarr_cfg_api_key: 'abcdef1234567890abcdef1234567890'
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'default'
-            version: 'v4.0.12.2823'
+            version: 'v4.0.15.2941'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz"
+                "/molecule/cache/Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
               }}'
           - comment: 'toggle'
-            version: 'v4.0.12.2823'
+            version: 'v4.0.15.2941'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/Sonarr.main.4.0.12.2823.linux-x64.tar.gz"
+                "/molecule/cache/Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
               }}'
 platforms:
   - name: 'sonarr-debian-12-update_mechanisms'

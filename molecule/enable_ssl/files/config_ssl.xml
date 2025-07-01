@@ -5,7 +5,7 @@
   <InstanceName>Sonarr</InstanceName>
   <EnableSsl>True</EnableSsl>
   <SslPort>9898</SslPort>
-  <SslCertPath>/var/lib/sonarr/sonarr.pfx</SslCertPath>
+  <SslCertPath>/data/sonarr/config/sonarr.pfx</SslCertPath>
   <SslCertPassword>test</SslCertPassword>
   <AuthenticationMethod>Forms</AuthenticationMethod>
   <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
