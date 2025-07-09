@@ -94,14 +94,14 @@ sonarr_srv_force_config_only_enable: false
 
 # User that Sonarr will run under.
 #
-# Enable sonarr_create_user if this account is not externally managed.
+# Enable sonarr_srv_create_user if this account is not externally managed.
 #
 # Default: 'media'.
 sonarr_srv_user: 'media'
 
 # Group that Sonarr will run under.
 #
-# Enable sonarr_create_user if this group is not externally managed.
+# Enable sonarr_srv_create_user if this group is not externally managed.
 #
 # Default: 'media'.
 sonarr_srv_group: 'media'
@@ -111,7 +111,7 @@ sonarr_srv_group: 'media'
 # Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
 #
 # Default: True.
-sonarr_create_user: true
+sonarr_srv_create_user: true
 
 ###############################################################################
 # Media Permissions

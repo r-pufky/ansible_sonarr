@@ -5,8 +5,14 @@
 # Start Sonarr services and confirm they are active and running.
 
 - name: 'Validate | start services'
-  notify: 'Handlers | restart sonarr'
-  ansible.builtin.meta: 'flush_handlers'
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    enabled: true
+    daemon_reload: true
+    state: 'started'
+  failed_when: false
+  loop:
+    - 'sonarr.service'
 
 - name: 'Validate | query service status'
   ansible.builtin.service_facts:
