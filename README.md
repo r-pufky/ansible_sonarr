@@ -33,9 +33,9 @@ permissions will be set to ensure Sonarr can read files.
     sonarr_cfg_api_key: '{{ vault_sonarr_api_key }}'
     sonarr_cfg_update_automatically: true
     sonarr_cfg_theme: 'dark'
-    sonarr_media_root_folders:
+    sonarr_srv_media_root_folders:
       - '/data/media'
-    sonarr_media_set_perms_file_enable: true
+    sonarr_srv_media_set_perms_file_enable: true
 ```
 
 ### Initial Deployment with No User

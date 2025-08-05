@@ -78,7 +78,7 @@ sonarr_srv_restart_daily_enable: true
 # Only apply configuration?
 #
 # Reduces role application time by ONLY applying configuration changes. Does
-# NOT affect sonarr_media_set_perms_file_enable.
+# NOT affect sonarr_srv_media_set_perms_file_enable.
 #
 # This should ONLY be used after the role has been fully run once.
 #
@@ -124,10 +124,10 @@ sonarr_srv_create_user: true
 # Root media storage folders.
 #
 # Folders will be created/set with sonarr_srv_user, sonarr_srv_group,
-# sonarr_media_perms_folder.
+# sonarr_srv_media_perms_folder.
 #
 # Default: [].
-sonarr_media_root_folders: []
+sonarr_srv_media_root_folders: []
 
 # Enable user management of data/media files?
 #
@@ -145,28 +145,28 @@ sonarr_srv_user_data_manage_enable: false
 
 # Media folder permissions octal.
 #
-# Media folders specified by sonarr_media_root_folders will always be
-# recursively set using sonarr_media_perms_folder, sonarr_srv_user, and
+# Media folders specified by sonarr_srv_media_root_folders will always be
+# recursively set using sonarr_srv_media_perms_folder, sonarr_srv_user, and
 # sonarr_srv_group.
 #
 # Default: '0755'.
-sonarr_media_perms_folder: '0755'
+sonarr_srv_media_perms_folder: '0755'
 
 # Enable setting of media file permissions?
 #
-# Set file permissions within sonarr_media_root_folders using
-# sonarr_media_perms_file, sonarr_srv_user, and sonarr_srv_group. Large sets of
-# files may be slow to set permissions.
+# Set file permissions within sonarr_srv_media_root_folders using
+# sonarr_srv_media_perms_file, sonarr_srv_user, and sonarr_srv_group. Large
+# sets of files may be slow to set permissions.
 #
 # Useful when first configuring to ensure service has access to all specified
 # media locations. Suggest applying with extra options:
 #
 #   ansible-playbook site.yml
 #       --tags Sonarr
-#       -e 'sonarr_media_set_perms_file_enable=true'
+#       -e 'sonarr_srv_media_set_perms_file_enable=true'
 #
 # Default: False.
-sonarr_media_set_perms_file_enable: false
+sonarr_srv_media_set_perms_file_enable: false
 
 # Media file permissions octal. Default: '0644'.
-sonarr_media_perms_file: '0644'
+sonarr_srv_media_perms_file: '0644'
