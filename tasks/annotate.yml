@@ -46,23 +46,6 @@
 # * https://github.com/Servarr/Wiki/blob/master/servarr/servarr-install-script.sh
 # yamllint enable rule:line-length
 
-# TODO(4.0+): Remove variable renaming check on next major Sonarr release.
-- name: 'Annotate | check deprecated variable usage'
-  when: >
-    hostvars[inventory_hostname] | dict2items |
-    selectattr("key", "match", "sonarr_config_*") | length > 0 or
-    hostvars[inventory_hostname] | dict2items |
-    selectattr("key", "match", "sonarr_service_*") | length > 0
-  ansible.builtin.fail:
-    msg: |
-      ✘ Role variables have migrated. Read defaults and update.
-
-      sonarr_config_* -> sonarr_cfg_*
-      sonarr_service_* -> sonarr_srv_*
-      sonarr_* -> sonarr_srv_*
-
-      DB files MUST be manually migrated if sonarr_srv_config_dir changed.
-
 - name: 'Annotate | sanitize & annotate service defaults'
   ansible.builtin.set_fact:
     _sonarr_srv_version: {

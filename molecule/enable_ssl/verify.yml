@@ -1,6 +1,6 @@
 ---
 - name: 'Verify | SSL enabled'
-  hosts: 'sonarr-debian-12-enable_ssl'
+  hosts: 'sonarr-debian-13-enable_ssl'
   gather_facts: false
   tasks:
     - name: 'Verify | SSL enabled | config.xml'
@@ -30,7 +30,7 @@
         test_diff: true
 
 - name: 'Verify | SSL toggled'
-  hosts: 'sonarr-debian-12-enable_ssl-toggle'
+  hosts: 'sonarr-debian-13-enable_ssl-toggle'
   gather_facts: false
   tasks:
     - name: 'Verify | SSL toggled | config.xml'

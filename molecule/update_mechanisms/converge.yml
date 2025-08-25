@@ -8,7 +8,7 @@
         name: 'r_pufky.srv.sonarr'
 
 - name: 'Converge | toggle updates'
-  hosts: 'sonarr-debian-12-update_mechanisms-toggle'
+  hosts: 'sonarr-debian-13-update_mechanisms-toggle'
   gather_facts: false
   tasks:
     - name: >-

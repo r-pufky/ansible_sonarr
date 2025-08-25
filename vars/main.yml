@@ -25,8 +25,8 @@
 # * https://github.com/Sonarr/Sonarr/releases
 
 # Last time Sonarr options were validated against a default configuration.
-sonarr_role_validate_date: '2025-07-01'
-sonarr_role_validate_release: 'bookworm'
+sonarr_role_validate_date: '2025-08-25'
+sonarr_role_validate_release: 'trixie'
 sonarr_role_validate_version: 'v4.0.15.2941'
 sonarr_role_validate_script_release: '1.0.3'
 sonarr_role_validate_script_date: '2024-01-06'
@@ -39,7 +39,7 @@ sonarr_role_packages:
   - 'sqlite3'  # Sonarr DB.
   - 'gnupg2'  # GPG for certificates.
   - 'ca-certificates'  # up to date certificates for certificate validation.
-  - 'libicu72'  # International Unicode support for .NET.
+  - 'libicu76'  # International Unicode support for .NET.
 
 ###############################################################################
 # Sonarr GitHub Options

@@ -28,7 +28,7 @@
         - '4.0.15.2941'
 
 - name: 'Prepare'
-  hosts: 'sonarr-debian-12-postgres_user_data'
+  hosts: 'sonarr-debian-13-postgres_user_data'
   gather_facts: false
   tasks:
     - name: 'Prepare | simulate user media restriction'

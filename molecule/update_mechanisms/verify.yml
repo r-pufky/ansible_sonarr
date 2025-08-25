@@ -1,6 +1,6 @@
 ---
 - name: 'Verify | script enabled'
-  hosts: 'sonarr-debian-12-update_mechanisms'
+  hosts: 'sonarr-debian-13-update_mechanisms'
   gather_facts: false
   tasks:
     - name: 'Verify | script enabled | config.xml'
@@ -34,7 +34,7 @@
         test_diff: true
 
 - name: 'Verify | script toggled'
-  hosts: 'sonarr-debian-12-update_mechanisms-toggle'
+  hosts: 'sonarr-debian-13-update_mechanisms-toggle'
   gather_facts: false
   tasks:
     - name: 'Verify | script toggled | config.xml'
