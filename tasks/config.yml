@@ -15,8 +15,8 @@
 - name: 'Config | set {{ _sonarr_srv_config_dir.raw }}'
   ansible.builtin.file:
     path: '{{ _sonarr_srv_config_dir.raw }}'
-    owner: '{{ _sonarr_srv_user.role_uid }}'
-    group: '{{ _sonarr_srv_group.role_gid }}'
+    owner: '{{ _sonarr_srv_user._uid }}'
+    group: '{{ _sonarr_srv_group._gid }}'
     mode: '0775'
     recurse: '{{ _sonarr_srv_permissions_recursive_enable.raw }}'
     state: 'directory'
@@ -32,39 +32,39 @@
   when: _sonarr_cfg_enable_ssl.raw
   ansible.builtin.copy:
     src: '{{ _sonarr_cfg_ssl_cert_path.raw }}'
-    dest: '{{ _sonarr_cfg_ssl_cert_path.role_dest }}'
-    owner: '{{ _sonarr_srv_user.role_uid }}'
-    group: '{{ _sonarr_srv_group.role_gid }}'
+    dest: '{{ _sonarr_cfg_ssl_cert_path._dest }}'
+    owner: '{{ _sonarr_srv_user._uid }}'
+    group: '{{ _sonarr_srv_group._gid }}'
     mode: '0640'
     force: true
 
-- name: 'Config | remove {{ _sonarr_cfg_ssl_cert_path.role_dest }}'
+- name: 'Config | remove {{ _sonarr_cfg_ssl_cert_path._dest }}'
   when: not _sonarr_cfg_enable_ssl.raw
   ansible.builtin.file:
-    dest: '{{ _sonarr_cfg_ssl_cert_path.role_dest }}'
+    dest: '{{ _sonarr_cfg_ssl_cert_path._dest }}'
     state: 'absent'
 
 - name: 'Config | set {{ _sonarr_cfg_update_script_path.raw }}'
   when: not _sonarr_cfg_update_mechanism.raw
   ansible.builtin.copy:
     src: '{{ _sonarr_cfg_update_script_path.raw }}'
-    dest: '{{ _sonarr_cfg_update_script_path.role_dest }}'
-    owner: '{{ _sonarr_srv_user.role_uid }}'
-    group: '{{ _sonarr_srv_group.role_gid }}'
+    dest: '{{ _sonarr_cfg_update_script_path._dest }}'
+    owner: '{{ _sonarr_srv_user._uid }}'
+    group: '{{ _sonarr_srv_group._gid }}'
     mode: '0750'
     force: true
 
-- name: 'Config | remove {{ _sonarr_cfg_update_script_path.role_dest }}'
+- name: 'Config | remove {{ _sonarr_cfg_update_script_path._dest }}'
   when: _sonarr_cfg_update_mechanism.raw
   ansible.builtin.file:
-    dest: '{{ _sonarr_cfg_update_script_path.role_dest }}'
+    dest: '{{ _sonarr_cfg_update_script_path._dest }}'
     state: 'absent'
 
 - name: 'Config | set media root folders'
   ansible.builtin.file:
     path: '{{ item }}'
-    owner: '{{ _sonarr_srv_user.role_uid }}'
-    group: '{{ _sonarr_srv_group.role_gid }}'
+    owner: '{{ _sonarr_srv_user._uid }}'
+    group: '{{ _sonarr_srv_group._gid }}'
     mode: '{{ _sonarr_srv_media_perms_folder.raw }}'
     recurse: '{{ _sonarr_srv_permissions_recursive_enable.raw }}'
     state: 'directory'
@@ -84,7 +84,7 @@
     find '{{ item }}'
     -type f
     -exec chmod {{ _sonarr_srv_media_perms_file.raw }} {};
-      chown {{ _sonarr_srv_user.role_uid }}:{{ _sonarr_srv_group.role_gid }} {} \;
+      chown {{ _sonarr_srv_user._uid }}:{{ _sonarr_srv_group._gid }} {} \;
   changed_when: false  # https://github.com/ansible/ansible/issues/32636
   become: true
   become_user: '{{
@@ -101,8 +101,8 @@
   ansible.builtin.template:
     src: 'config.xml.j2'
     dest: '{{ _sonarr_srv_config_dir.data ~ "config.xml" }}'
-    owner: '{{ _sonarr_srv_user.role_uid }}'
-    group: '{{ _sonarr_srv_group.role_gid }}'
+    owner: '{{ _sonarr_srv_user._uid }}'
+    group: '{{ _sonarr_srv_group._gid }}'
     mode: '0600'
 
 - name: 'Config | Sonarr service'

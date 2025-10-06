@@ -82,11 +82,11 @@
   ansible.builtin.set_fact:
     _sonarr_srv_user: '{{
         _sonarr_srv_user |
-        combine({"role_uid": _sonarr_srv_user_query.uid})
+        combine({"_uid": _sonarr_srv_user_query.uid})
       }}'
     _sonarr_srv_group: '{{
         _sonarr_srv_group |
-        combine({"role_gid": _sonarr_srv_user_query.group})
+        combine({"_gid": _sonarr_srv_user_query.group})
       }}'
 
 - name: 'Prep | stop services'
