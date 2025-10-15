@@ -49,7 +49,7 @@ platforms:
     command: '/lib/systemd/systemd'
     pre_build_image: true
     published_ports:
-      - '8989/tcp'
+      - '8989:8989/tcp'
   - name: 'sonarr-debian-13-user_data'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
