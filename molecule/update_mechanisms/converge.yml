@@ -3,9 +3,9 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Converge | apply r_pufky.srv.sonarr'
+    - name: 'Converge | apply r_pufky.arr.sonarr'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.sonarr'
+        name: 'r_pufky.arr.sonarr'
 
 - name: 'Converge | toggle updates'
   hosts: 'sonarr-debian-13-update_mechanisms-toggle'
@@ -13,8 +13,8 @@
   tasks:
     - name: >-
         Converge | toggle updates |
-        apply r_pufky.srv.sonarr
+        apply r_pufky.arr.sonarr
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.sonarr'
+        name: 'r_pufky.arr.sonarr'
       vars:
         sonarr_cfg_update_mechanism: true
