@@ -11,21 +11,27 @@
       vars:
         test_name: 'Prepare | create cache'
 
+    - name: 'Prepare | parse test version'
+      ansible.builtin.set_fact:
+        test_version: '4.0.15.2941'
+        test_version_old: '4.0.8.1874'
+
     - name: 'Prepare | check cache'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
         test_name: 'Prepare | cache {{ item }}'
-        test_dest: 'Sonarr.main.{{ item }}.linux-x64.tar.gz'
+        test_dest: '{{ "Sonarr.main." ~ item ~ ".linux-x64.tar.gz" }}'
         test_url: '{{
-            "https://github.com/Sonarr/Sonarr/releases/download/v" ~ item ~
-            "/" ~ "Sonarr.main." ~ item ~ ".linux-x64.tar.gz"
+            "https://github.com/Sonarr/Sonarr/releases/download/" ~
+            "v" ~ item ~ "/" ~
+            "Sonarr.main." ~ item ~ ".linux-x64.tar.gz"
           }}'
         test_mode: '0640'
       loop:
-        - '4.0.8.1874'
-        - '4.0.15.2941'
+        - '{{ test_version }}'
+        - '{{ test_version_old }}'
 
 - name: 'Prepare'
   hosts: 'sonarr-debian-13-postgres_user_data'

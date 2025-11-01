@@ -30,17 +30,21 @@
       vars:
         test_name: 'Prepare | create cache'
 
-    - name: 'Prepare | check 4.0.15.2941'
+    - name: 'Prepare | parse test version'
+      ansible.builtin.set_fact:
+        test_version: '4.0.15.2941'
+
+    - name: '{{ "Prepare | cache " ~ test_version }}'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'cache_url.yml'
       vars:
-        test_name: 'Prepare | cache 4.0.15.2941'
-        test_dest: 'Sonarr.main.4.0.15.2941.linux-x64.tar.gz'
+        test_name: '{{ "Prepare | cache " ~ test_version }}'
+        test_dest: '{{ "Sonarr.main." ~ test_version ~ ".linux-x64.tar.gz" }}'
         test_url: '{{
             "https://github.com/Sonarr/Sonarr/releases/download/" ~
-            "v4.0.15.2941/" ~
-            "Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
+            "v" ~ test_version ~ "/" ~
+            "Sonarr.main." ~ test_version ~ ".linux-x64.tar.gz"
           }}'
         test_mode: '0640'
 

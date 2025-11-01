@@ -16,5 +16,6 @@ galaxy_info:
     - 'sonarr'
     - 'media'
     - 'tv'
+    - 'arr'
 
 dependencies: []
