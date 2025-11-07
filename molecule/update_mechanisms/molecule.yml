@@ -30,16 +30,16 @@ provisioner:
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'default'
-            version: 'v4.0.15.2941'
+            version: 'v4.0.16.2944'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
+                "/molecule/cache/Sonarr.main.4.0.16.2944.linux-x64.tar.gz"
               }}'
           - comment: 'toggle'
-            version: 'v4.0.15.2941'
+            version: 'v4.0.16.2944'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
+                "/molecule/cache/Sonarr.main.4.0.16.2944.linux-x64.tar.gz"
               }}'
 platforms:
   - name: 'sonarr-debian-13-update_mechanisms'

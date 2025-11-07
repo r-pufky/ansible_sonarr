@@ -23,7 +23,7 @@
 # Last time Sonarr options were validated against a default configuration.
 sonarr_role_validate_date: '2025-08-25'
 sonarr_role_validate_release: 'trixie'
-sonarr_role_validate_version: 'v4.0.15.2941'
+sonarr_role_validate_version: 'v4.0.16.2944'
 sonarr_role_validate_script_release: '1.0.3'
 sonarr_role_validate_script_date: '2024-01-06'
 

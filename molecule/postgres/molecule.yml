@@ -35,11 +35,11 @@ provisioner:
         repo_testing_enable: true
         repo_testing_versions:
           - comment: 'default'
-            version: 'v4.0.15.2941'
+            version: 'v4.0.16.2944'
             asset: '{{
                 lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
                 "/molecule/cache/" ~
-                "Sonarr.main.4.0.15.2941.linux-x64.tar.gz"
+                "Sonarr.main.4.0.16.2944.linux-x64.tar.gz"
               }}'
         sonarr_cfg_database_type: 'postgres'
         sonarr_cfg_database_host: 'localhost'

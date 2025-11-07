@@ -24,11 +24,11 @@
 #   RECOMMEND: Only increment PATCH. Never use 'latest'.
 #
 # Values:
-#   {VERSION}: Tagged release to use ('v4.0.15.2941').
+#   {VERSION}: Tagged release to use ('v4.0.16.2944').
 #      latest: Use latest stable release.
 #
-# Default: 'v4.0.15.2941'.
-sonarr_srv_version: 'v4.0.15.2941'
+# Default: 'v4.0.16.2944'.
+sonarr_srv_version: 'v4.0.16.2944'
 
 # Remove old installs on upgrade success? Default: True.
 sonarr_srv_delete_old_versions_enable: true
