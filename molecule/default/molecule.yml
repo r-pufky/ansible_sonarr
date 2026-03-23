@@ -6,13 +6,12 @@
 # with and without sonarr_srv_user_data_manage_enable.
 #
 # Tests:
-# * config.xml set.
+# * files/default/config.xml set.
 # * sonarr.service active and running.
-# * /data/sonarr/config created with correct permissions.
-# * /data/media created with correct permissions.
-# * /data/media - file permissions recursively set with correct permissions.
-# * /data/sonarr/config/update_script does not exist.
-# * /data/sonarr/config/sonarr.pfx does not exist.
+# * Standard role run with auto generation (during prep).
+# * Standard role run with injected config.xml.
+# * Backup created.
+# * Restore applied.
 
 dependency:
   name: 'galaxy'
@@ -29,19 +28,11 @@ provisioner:
   inventory:
     group_vars:
       all:
-        sonarr_srv_media_root_folders: ['/data/media']
-        sonarr_cfg_api_key: 'abcdef1234567890abcdef1234567890'
-        repo_testing_enable: true
-        repo_testing_versions:
-          - comment: 'default'
-            version: 'v4.0.16.2944'
-            asset: '{{
-                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-                "/molecule/cache/" ~
-                "Sonarr.main.4.0.16.2944.linux-x64.tar.gz"
-              }}'
+        url_inject_enable: true
+        sonarr_cfg_backup_dir: '/tmp/ansible_sonarr_test'
+        sonarr_cfg_backup_metadata: false
 platforms:
-  - name: 'sonarr-debian-13-default'
+  - name: 'sonarr-default'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
@@ -50,19 +41,8 @@ platforms:
     pre_build_image: true
     published_ports:
       - '8989:8989/tcp'
-  - name: 'sonarr-debian-13-user_data'
-    image: 'ghcr.io/hifis-net/debian-systemd:13'
-    systemd: 'always'
-    volumes:
-      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
-    command: '/lib/systemd/systemd'
-    pre_build_image: true
 verifier:
   name: 'ansible'
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
 scenario:
   test_sequence:
     - 'destroy'

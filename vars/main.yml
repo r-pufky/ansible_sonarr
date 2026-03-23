@@ -8,34 +8,36 @@
 # * Branch for new Debian releases.
 # * KEEP a separate change log as changes are made.
 # * Use bare-metal docs to validate package/process changes.
-# * Update role defaults (includes updating defaults, tasks):
-#   * Use configuration docs to add new variables.
-#   * Use defaults to remove any changed/deprecated variables.
+# * Update defaults.
 # * Update tests for any changes.
-#   * Use BARE VERSION for find and replace to set new version.
-# * Standard role validation testing (yamllint, ansible-lint, to-do, no-qa).
-# * Tag with OS-APP-ROLE version.
+# * Standard validation testing (yamllint, ansible-lint, to-do, no-qa).
 #
 # Reference:
 # * https://github.com/Sonarr/Sonarr/blob/main/distribution/debian/install.sh
 # * https://github.com/Sonarr/Sonarr/releases
 
-# Last time Sonarr options were validated against a default configuration.
-sonarr_role_validate_date: '2025-08-25'
-sonarr_role_validate_release: 'trixie'
-sonarr_role_validate_version: 'v4.0.16.2944'
-sonarr_role_validate_script_release: '1.0.3'
-sonarr_role_validate_script_date: '2024-01-06'
+sonarr___release: "{{ {} | r_pufky.data.v3(
+
+    _date='2026-03-23',
+    _debian='trixie',
+    _app='v4.0.17.2952',
+    _script_release='1.0.3',
+    _script_date='2024-01-06',
+  ) }}"
 
 ###############################################################################
 # APT Packages
 ###############################################################################
 
-sonarr_role_packages:
+sonarr___packages:
   - 'sqlite3'  # Sonarr DB.
   - 'gnupg2'  # GPG for certificates.
   - 'ca-certificates'  # Up to date certificates for certificate validation.
   - 'libicu76'  # International Unicode support for .NET.
+
+  # Ansible.
+  - 'xz-utils'  # xz archives.
+  - 'rsync'  # ansible.posix.synchronize.
 
 ###############################################################################
 # Sonarr GitHub Options
@@ -43,29 +45,34 @@ sonarr_role_packages:
 # Reference:
 # * https://github.com/Sonarr/Sonarr/releases/latest
 
-sonarr_role_repo_release_owner: 'Sonarr'
-sonarr_role_repo_release_repo: 'Sonarr'
-sonarr_role_repo_extract_dir: '/opt/sonarr'
-sonarr_role_repo_extract_symlink: '/opt/sonarr/sonarr'
-sonarr_role_repo_release_specifier: 'v'
-sonarr_role_repo_release_asset: 'Sonarr.main.{BARE_VERSION}.linux-x64.tar.gz'
-sonarr_role_repo_extract_migrate_files:
-  - 'sonarr.db'
-  - 'sonarr.db-shm'  # Sonarr never closes DB's correctly.
-  - 'sonarr.db-wal'
-  - 'logs.db'
-  - 'logs.db-shm'
-  - 'logs.db-wal'
+sonarr___repo_url:
+  'https://github.com/Sonarr/Sonarr/releases/download/'
+sonarr___package:
+  '{{ "Sonarr.main." ~ sonarr___release._app[1:] ~ ".linux-x64.tar.gz" }}'
+
+sonarr___app: "{{ {} | r_pufky.data.v3(
+
+    _version=sonarr___release._app,
+    _package=sonarr___package,
+    _var_dir='/var/opt/sonarr',
+    _cfg='/var/opt/sonarr/config.xml',
+    _opt_dir='/opt/sonarr',
+    _src_dir='/opt/sonarr/src',
+    _app='/opt/sonarr/src/' ~ sonarr___release._app,
+    _service='/etc/systemd/system/sonarr.service',
+    _base_url=sonarr___repo_url,
+    _url=sonarr___repo_url ~ sonarr___release._app ~ '/' ~ sonarr___package,
+  ) }}"
 
 ###############################################################################
 # Default Sonarr User/Group
 ###############################################################################
 
-sonarr_role_group:
+sonarr___group:
   name: 'media'
   gid: 5555
 
-sonarr_role_user:
+sonarr___user:
   name: 'media'
   group: 'media'
   uid: 5555
