@@ -110,14 +110,14 @@ molecule test --all
 
 ### [Releases][b]
 
- Release | Debian | Ansible | Sonarr | Notes
----------|--------|---------|--------|-------
- 6.x.x   | 13     | 2.20    | V4     | Ansible 2.20, feature flags, and semantic versioning.
- 5.x.x   | 13     | 2.18    | V4     | Migrate to r_pufky.arr.
- 4.x.x   | 13     | 2.18    | V4     | Migrate to Debian Trixie.
- 3.x.x   | 12     | 2.18    | V4     | Implement data annotations.
- 2.x.x   | 12     | 2.18    | V4     | Migrate to Sonarr V4.
- 1.x.x   | 12     | 2.11    | V3     | Migration from private repository.
+  Release | Debian | Ansible | Sonarr | Notes
+ ---------|--------|---------|--------|-------
+  6.x.x   | 13     | 2.20    | V4     | Ansible 2.20, feature flags, and semantic versioning.
+  5.x.x   | 13     | 2.18    | V4     | Migrate to r_pufky.arr.
+  4.x.x   | 13     | 2.18    | V4     | Migrate to Debian Trixie.
+  3.x.x   | 12     | 2.18    | V4     | Implement data annotations.
+  2.x.x   | 12     | 2.18    | V4     | Migrate to Sonarr V4.
+  1.x.x   | 12     | 2.11    | V3     | Migration from private repository.
 
 ## Issues
 Create a bug and provide as much information as possible.
