@@ -19,23 +19,19 @@
 
 - name: 'Install | filesystem | set system directories'
   ansible.builtin.file:
-    path: '{{ item }}'
+    path: '{{ sonarr___app._src_d }}'
     owner: 'root'
     group: 'root'
     mode: '0755'
     state: 'directory'
-  loop:
-    - '{{ sonarr___app._src_dir }}'
 
 - name: 'Install | filesystem | set service directories'
   ansible.builtin.file:
-    path: '{{ item }}'
+    path: '{{ sonarr___app._var_d }}'
     owner: '{{ sonarr__srv._user }}'
     group: '{{ sonarr__srv._group }}'
     mode: '0755'
     state: 'directory'
-  loop:
-    - '{{ sonarr___app._var_dir }}'
 
 - name: 'Install | packages'
   ansible.builtin.include_role:
@@ -47,7 +43,7 @@
 
 - name: 'Install | filesystem | find previous installations'
   ansible.builtin.find:
-    paths: '{{ sonarr__cfg._src_dir }}'
+    paths: '{{ sonarr___app._src_d }}'
     file_type: 'directory'
     recurse: false
     excludes:
@@ -63,7 +59,7 @@
     label: '{{ item.path }}'
 
 - name: 'Install | url | 🗘 Sonarr (~1 minute) 🗘'
-  when: not (url_inject_enable | default(false))
+  when: not (molecule_flg_inject | default(false))
   ansible.builtin.get_url:
     url: '{{ sonarr__cfg._url }}'
     dest: '{{ "/tmp/" ~ sonarr__cfg._package }}'
@@ -76,9 +72,9 @@
   register: sonarr__cmd
   until: sonarr__cmd is succeeded
 
-- name: '{{ "Install | filesystem | set " ~ sonarr__cfg._app }}'
+- name: '{{ "Install | filesystem | set " ~ sonarr__cfg._app_d }}'
   ansible.builtin.file:
-    path: '{{ sonarr__cfg._app }}'
+    path: '{{ sonarr__cfg._app_d }}'
     owner: 'root'
     group: 'root'
     mode: '0755'
@@ -86,19 +82,19 @@
 
 - name: 'Install | filesystem | unpack Sonarr'
   ansible.builtin.unarchive:
-    creates: '{{ sonarr__cfg._app ~ "/Sonarr" }}'
+    creates: '{{ sonarr__cfg._app_d ~ "/Sonarr" }}'
     src: '{{ "/tmp/" ~ sonarr__cfg._package }}'
     remote_src: true
-    dest: '{{ sonarr__cfg._app }}'
+    dest: '{{ sonarr__cfg._app_d }}'
     owner: 'root'
     group: 'root'
     mode: 'a-st'
     extra_opts: ['--strip-components=1']
 
-- name: '{{ "Install | filesystem | set " ~ sonarr__cfg._service }}'
+- name: '{{ "Install | filesystem | set " ~ sonarr___app._service }}'
   ansible.builtin.template:
     src: 'systemd/sonarr.service.j2'
-    dest: '{{ sonarr__cfg._service }}'
+    dest: '{{ sonarr___app._service }}'
     owner: 'root'
     group: 'root'
     mode: '0644'

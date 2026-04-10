@@ -9,33 +9,50 @@
 # large metadata downloads on new version if not migrated with databases.
 # Exclude from removal during configuration sync.
 
-- name: 'Config | filetree | deploy managed files'
+- name: 'Config | filetree | set managed directories'
+  ansible.builtin.file:
+    path: '{{ sonarr___app._var_d ~ "/" ~ item.path }}'
+    owner: '{{ sonarr__srv._user }}'
+    group: '{{ sonarr__srv._group }}'
+    mode: '0750'
+    state: 'directory'
+  loop: '{{ query("community.general.filetree", sonarr__cfg._d) }}'
+  loop_control:
+    label: '{{ item.path }}'
+  when: item.state == 'directory'
+
+- name: 'Config | filetree | set managed files'
   ansible.builtin.template:
     src: '{{ item.src }}'
-    dest: '{{ sonarr__cfg._var_dir ~ "/" ~ item.path }}'
+    dest: '{{ sonarr___app._var_d ~ "/" ~ item.path }}'
     owner: '{{ sonarr__srv._user }}'
     group: '{{ sonarr__srv._group }}'
     mode: '0640'
-  loop: '{{ query("community.general.filetree", sonarr__cfg._dir) }}'
+  loop: '{{ query("community.general.filetree", sonarr__cfg._d) }}'
   loop_control:
     label: '{{ item.path }}'
   when: item.state == 'file'
-  register: sonarr__local
 
 - name: 'Config | filesystem | query remote files'
   ansible.builtin.find:
-    paths: '{{ sonarr__cfg._var_dir }}'
-    file_type: 'file'
+    paths: '{{ sonarr___app._var_d }}'
+    file_type: 'any'
+    hidden: true
     recurse: true
     excludes: 'MediaCover'  # Ignore MediaCover to prevent metadata deletion.
   register: sonarr__remote
 
-- name: 'Config | filesystem | remove unmanaged files'
+- name: 'Config | filetree | remove unmanaged files and directories'
   ansible.builtin.file:
     path: '{{ item.path }}'
     state: 'absent'
-  loop: '{{ sonarr__remote.files }}'
+  loop: '{{ sonarr__remote.files | sort(attribute="path", reverse=true) }}'
   loop_control:
     label: '{{ item.path }}'
   when: >
-    item.path not in sonarr__local.results | map(attribute='dest') | list
+    item.path not in
+    (
+      query("community.general.filetree", sonarr__cfg._d) |
+      map(attribute='path') |
+      map('regex_replace', '^', sonarr___app._var_d ~ "/") | list
+    )

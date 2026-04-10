@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart={{ sonarr__cfg._app ~ "/Sonarr" }} -nobrowser -data={{ sonarr__cfg._var_dir }}
+ExecStart={{ sonarr__cfg._app_d ~ "/Sonarr" }} -nobrowser -data={{ sonarr___app._var_d }}
 TimeoutStopSec=20
 Restart=always
 User={{ sonarr__srv._user }}

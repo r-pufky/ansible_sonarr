@@ -70,7 +70,7 @@ DB's, etc. Existing installs likely want to use **backup** and **restore**.
     name: 'r_pufky.arr.sonarr'
   vars:
     sonarr_flg_config: true
-    sonarr_cfg_dir: 'host_vars/sonarr.example.com/data'
+    sonarr_cfg_d: 'host_vars/sonarr.example.com/data'
 ```
 
 #### Dynamic Deployments
@@ -90,14 +90,14 @@ or leave sonarr_flg_config disabled to leave existing config untouched.
     name: 'r_pufky.arr.sonarr'
   vars:
     sonarr_flg_backup: true
-    sonarr_cfg_backup_dir: '/tmp'
+    sonarr_cfg_backup_d: '/tmp'
 
 - name: 'Restore from backup.'
   ansible.builtin.include_role:
     name: 'r_pufky.arr.sonarr'
   vars:
     sonarr_flg_restore: true
-    sonarr_cfg_backup_dir: '/tmp'
+    sonarr_cfg_backup_d: '/tmp'
 ```
 
 ## Development
@@ -107,6 +107,12 @@ Configure [environment][a].
 # Run all tests.
 molecule test --all
 ```
+
+Testing variables:
+
+  Variable            | Type | Description
+ ---------------------|------|-------------
+  molecule_flg_inject | bool | Disable **get_url** to inject files locally.
 
 ### [Releases][b]
 
@@ -144,7 +150,7 @@ PGP: [466EEC2B67516C7117C85CE3A0BC35D16698BAB9][d] | [github gist][e]
 [j]: https://github.com/r-pufky/ansible_sonarr/tree/main/defaults/main/main.yml
 [k]: https://github.com/r-pufky/ansible_sonarr/blob/main/defaults/main/ports.yml
 [l]: https://wiki.servarr.com/en/sonarr/postgres-setup
-[m]: https://github.com/r-pufky/ansible_sonarr/blob/main/files/postgres/config.xml
-[n]: https://github.com/r-pufky/ansible_sonarr/blob/main/files/
+[m]: https://github.com/r-pufky/ansible_sonarr/blob/main/templates/postgres/config.xml
+[n]: https://github.com/r-pufky/ansible_sonarr/blob/main/templates/
 [o]: https://sonarr.audio
 [p]: https://wiki.servarr.com/en/sonarr/faq-v4#forced-authentication

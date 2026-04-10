@@ -11,8 +11,8 @@
         name: 'r_pufky.arr.sonarr'
       vars:
         sonarr_flg_config: true
-        sonarr_cfg_dir: '{{
-            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/files/default"
+        sonarr_cfg_d: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/templates/default"
           }}'
 
     - name: 'Converge | role | r_pufky.arr.sonarr (create db backup)'

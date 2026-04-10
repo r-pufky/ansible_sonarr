@@ -20,13 +20,13 @@
 
         _version=sonarr_srv_version,
         _package='Sonarr.main.' ~ sonarr_srv_version[1:] ~ '.linux-x64.tar.gz',
-        _app='/opt/sonarr/src/' ~ sonarr_srv_version,
+        _app_d='/opt/sonarr/src/' ~ sonarr_srv_version,
         _url=(
           sonarr___repo_url ~ sonarr_srv_version ~ '/' ~
           'Sonarr.main.' ~ sonarr_srv_version[1:] ~ '.linux-x64.tar.gz'
         ),
-        _dir=sonarr_cfg_dir | regex_replace('\\/$', ''),
-        _backup_dir=sonarr_cfg_backup_dir | regex_replace('\\/$', ''),
+        _d=sonarr_cfg_d | regex_replace('\\/$', ''),
+        _backup_d=sonarr_cfg_backup_d | regex_replace('\\/$', ''),
         _backup_metadata=sonarr_cfg_backup_metadata,
       ) }}"
 
@@ -35,42 +35,42 @@
   ansible.builtin.assert:
     quiet: true
     that:
-      - sonarr__cfg._backup_dir | length > 0
+      - sonarr__cfg._backup_d | length > 0
     fail_msg: |
 
       ✘ Backup location not set.
       Backups enabled but no backup location defined.
 
       sonarr_flg_backup: {{ sonarr_flg_backup }}
-      sonarr_cfg_backup_dir: {{ sonarr__cfg._backup_dir }}
+      sonarr_cfg_backup_d: {{ sonarr__cfg._backup_d }}
 
 - name: 'Prep | assert | restore enabled and location defined'
   when: sonarr_flg_restore
   ansible.builtin.assert:
     quiet: true
     that:
-      - sonarr__cfg._backup_dir | length > 0
+      - sonarr__cfg._backup_d | length > 0
     fail_msg: |
 
       ✘ Backup location not set.
       Backups enabled but no backup location defined.
 
       sonarr_flg_restore: {{ sonarr_flg_restore }}
-      sonarr_cfg_backup_dir: {{ sonarr__cfg._backup_dir }}
+      sonarr_cfg_backup_d: {{ sonarr__cfg._backup_d }}
 
 - name: 'Prep | assert | config enabled and source defined'
   when: sonarr_flg_config
   ansible.builtin.assert:
     quiet: true
     that:
-      - sonarr__cfg._dir | length > 0
+      - sonarr__cfg._d | length > 0
     fail_msg: |
 
       ✘ Config source not set.
       Config source enabled but no config source defined.
 
       sonarr_flg_config: {{ sonarr_flg_config }}
-      sonarr_cfg_dir: {{ sonarr__cfg._dir }}
+      sonarr_cfg_d: {{ sonarr__cfg._d }}
 
 - name: '{{ "Prep | account | query user " ~ sonarr__srv._user }}'
   ansible.builtin.command: '{{ "id " ~ sonarr__srv._user }}'

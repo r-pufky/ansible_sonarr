@@ -54,10 +54,9 @@ sonarr___app: "{{ {} | r_pufky.data.v3(
 
     _version=sonarr___release._app,
     _package=sonarr___package,
-    _var_dir='/var/opt/sonarr',
-    _cfg='/var/opt/sonarr/config.xml',
-    _opt_dir='/opt/sonarr',
-    _src_dir='/opt/sonarr/src',
+    _var_d='/var/opt/sonarr',
+    _config_xml='/var/opt/sonarr/config.xml',
+    _src_d='/opt/sonarr/src',
     _app='/opt/sonarr/src/' ~ sonarr___release._app,
     _service='/etc/systemd/system/sonarr.service',
     _base_url=sonarr___repo_url,
