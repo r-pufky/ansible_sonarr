@@ -60,11 +60,11 @@ sonarr_flg_config: false
 #       PATCH: Safe - Usually requires no role updates.
 #   RECOMMEND: Only increment MINOR.PATCH.
 #
-# Default: 'v4.0.17.2952'.
+# Default: 'v4.0.19.2979'.
 #
 # Reference:
 # * https://github.com/Sonarr/Sonarr/releases/latest
-sonarr_srv_version: 'v4.0.17.2952'
+sonarr_srv_version: 'v4.0.19.2979'
 
 # Github access token (sonarr).
 #

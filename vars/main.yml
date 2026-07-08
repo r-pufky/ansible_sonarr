@@ -20,7 +20,7 @@ sonarr___release: "{{ {} | r_pufky.data.v3(
 
     _date='2026-03-23',
     _debian='trixie',
-    _app='v4.0.17.2952',
+    _app='v4.0.19.2979',
     _script_release='1.0.3',
     _script_date='2024-01-06',
   ) }}"
